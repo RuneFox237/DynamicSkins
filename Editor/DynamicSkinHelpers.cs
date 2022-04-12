@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace RuneFoxMods
+namespace DynamicSkinBuilder
 {
   static class DynamicSkinHelpers
   {

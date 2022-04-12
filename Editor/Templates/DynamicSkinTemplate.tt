@@ -17,7 +17,7 @@ namespace <#= dynamicSkin.modInfo.modName #>
   {
     ///////////////////////////////////////////////////////////
     /// Add Declerations of all Modifications here
-    <# foreach(var mod in dynamicSkin.Mods) {#>
+    <# foreach(var mod in dynamicSkin.DynamicModifications) {#>
     Modification <#= mod.Prefab.name #>Modification;
     <# } #>
     ///
@@ -51,20 +51,20 @@ namespace <#= dynamicSkin.modInfo.modName #>
     {
       //////////////////////////////////////////////////
       //Should Load all modifications here
-      <# foreach(var mod in dynamicSkin.Mods) {
+      <# foreach(var mod in dynamicSkin.DynamicModifications) {
       //ModificationName = new Modification("PrefabName.prefab", "ParentName", "BodyName", false, assetBundle);
       #>
       <#= mod.Prefab.name #>Modification = new Modification("<#= mod.Prefab.name #>.prefab", "<#= mod.ParentBone.name #>", "<#= dynamicSkin.skinDef.bodyName #>", <#= mod.AffectsBaseModel #>, assetBundle);
       <# } #>
 
-      <# foreach(var mod in dynamicSkin.Mods) { 
+      <# foreach(var mod in dynamicSkin.DynamicModifications) { 
       //ModificationName.dynamicBoneData = null; //get from DB reader
       #>
       <#= mod.Prefab.name #>Modification.dynamicBoneData = <#= DynamicBoneReader.CreateConstructor(mod.DynamicBone) #>
       <# } #>
 
       //add mods to mod list
-      <# foreach(var mod in dynamicSkin.Mods) { 
+      <# foreach(var mod in dynamicSkin.DynamicModifications) { 
       //ModificationList.Add(ModificationName);
       #>
       ModificationList.Add(<#= mod.Prefab.name #>Modification);
