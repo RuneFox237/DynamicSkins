@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEditor;
-using RoR2;
 
 namespace DynamicSkinBuilder
 {
@@ -12,7 +11,7 @@ namespace DynamicSkinBuilder
     
     public static string CreateConstructor(DynamicBone DB)
     {
-      string constructor = "ModificationName.dynamicBoneData = new DynamicBoneData(" +
+      string constructor = "new DynamicBoneData(" +
         PrintString(DB.m_Root.name) + ", " +
         PrintFloat(DB.m_Damping) + ", " + PrintAnimationCurve(DB.m_DampingDistrib) + ", " +
         PrintFloat(DB.m_Elasticity) + ", " + PrintAnimationCurve(DB.m_ElasticityDistrib) + ", " +
@@ -33,7 +32,7 @@ namespace DynamicSkinBuilder
     // So try and see if deleting the offending version to see if the errors clear up
     // The Older version that RoR2 uses does not support Plane Coliiders
   
-    string PrintColliders(List<DynamicBoneColliderBase> colliders)
+    static string PrintColliders(List<DynamicBoneColliderBase> colliders)
     {
       string str = "\nnew List<DynamicBoneColliderData>() {";
       foreach (var coll in colliders)
@@ -49,25 +48,25 @@ namespace DynamicSkinBuilder
       return str;
     }
   
-    static string PrintColliders(List<DynamicBoneCollider> colliders)
-    {
-      string str = "\nnew List<DynamicBoneColliderData>() {";
-      foreach (var coll in colliders)
-      {
-        str += "\n  " + PrintCollider(coll) + ", ";
-      }
+    //static string PrintColliders(List<DynamicBoneCollider> colliders)
+    //{
+    //  string str = "\nnew List<DynamicBoneColliderData>() {";
+    //  foreach (var coll in colliders)
+    //  {
+    //    str += "\n  " + PrintCollider(coll) + ", ";
+    //  }
+    //
+    //  if (colliders.Count != 0)
+    //  {
+    //    str = str.Remove(str.Length - 2);
+    //    str += "\n";
+    //  }
+    //
+    //  str += "}";
+    //  return str;
+    //}
   
-      if (colliders.Count != 0)
-      {
-        str = str.Remove(str.Length - 2);
-        str += "\n";
-      }
-  
-      str += "}";
-      return str;
-    }
-  
-    string PrintCollider(DynamicBoneColliderBase collider)
+    static string PrintCollider(DynamicBoneColliderBase collider)
     {
       return PrintCollider(collider as DynamicBoneCollider);
     }
@@ -237,28 +236,28 @@ namespace DynamicSkinBuilder
   
   }
   
-  #if (UNITY_EDITOR)
-  [CustomEditor(typeof(DynamicBoneReader))]
-  class DynamicBoneReaderEditor : Editor
-  {
-    //SerializedProperty SkirtPrefab_m;
-    //
-    //void OnEnable()
-    //{
-    //  // Fetch the objects from the GameObject script to display in the inspector
-    //  SkirtPrefab_m = serializedObject.FindProperty("SkirtPrefab_m");
-    //}
-  
-    public override void OnInspectorGUI()
-    {
-      DrawDefaultInspector();
-      DynamicBoneReader script = (DynamicBoneReader)target;    
-      if (GUILayout.Button("Print"))
-      {
-        script.Strtest = script.CreateConstructor(script.bones);
-      }
-    }
-  }
-  #endif
+  // #if (UNITY_EDITOR)
+  // [CustomEditor(typeof(DynamicBoneReader))]
+  // class DynamicBoneReaderEditor : Editor
+  // {
+  //   //SerializedProperty SkirtPrefab_m;
+  //   //
+  //   //void OnEnable()
+  //   //{
+  //   //  // Fetch the objects from the GameObject script to display in the inspector
+  //   //  SkirtPrefab_m = serializedObject.FindProperty("SkirtPrefab_m");
+  //   //}
+  // 
+  //   //public override void OnInspectorGUI()
+  //   //{
+  //   //  DrawDefaultInspector();
+  //   //  DynamicBoneReader script = (DynamicBoneReader)target;    
+  //   //  if (GUILayout.Button("Print"))
+  //   //  {
+  //   //    script.Strtest = script.CreateConstructor(script.bones);
+  //   //  }
+  //   //}
+  // }
+  // #endif
 
 }

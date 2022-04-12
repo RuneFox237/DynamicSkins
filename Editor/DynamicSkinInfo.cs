@@ -11,18 +11,28 @@ public class DynamicSkinInfo : MonoBehaviour
   public SkinDefinition skinDef;
   public SkinModInfo modInfo;
 
-  internal AssetsInfo assetInfo;
+  public AssetsInfo assetInfo;
 
   [SerializeField]
   public List<DynamicModification> DynamicModifications = new List<DynamicModification>();
 
-  DynamicSkinInfo(SkinModInfo modinfo_, SkinDefinition skindef_)
+  public DynamicSkinInfo(SkinModInfo modinfo_, SkinDefinition skindef_)
   {
     skinDef = skindef_;
     modInfo = modinfo_;
     assetInfo = new AssetsInfo(modinfo_);
   }
+  public DynamicSkinInfo(DynamicSkinInfo dynamicSkinInfo_)
+  {
+    skinDef = dynamicSkinInfo_.skinDef;
+    modInfo = dynamicSkinInfo_.modInfo;
+    assetInfo = new AssetsInfo(modInfo);
+  }
 
+  public void InitializeAssetInfo()
+  {
+    assetInfo = new AssetsInfo(modInfo);
+  }
 
   [Serializable]
   public class DynamicModification

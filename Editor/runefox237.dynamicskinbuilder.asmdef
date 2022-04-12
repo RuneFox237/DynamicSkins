@@ -1,0 +1,18 @@
+{
+    "name": "runefox237.dynamicskinbuilder",
+    "references": [
+        "GUID:f4f00f7a8e3f64041863806f84194035",
+        "GUID:420d696f3c2739f4697e78d61fd43b2e"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
