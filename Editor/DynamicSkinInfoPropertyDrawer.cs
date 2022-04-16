@@ -35,6 +35,9 @@ namespace DynamicSkinBuilder.CustomEditors
       File.Copy("Packages/com.runefox237.dynamicskinbuilder/Editor/CopyPath/RuneFox_Utils.cs", dynamicSkinInfo.assetInfo.modFolder + "/RuneFox_Utils.cs", true);
 
       AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+      AssetDatabase.ImportAsset(dynamicSkinInfo.assetInfo.modFolder + "/DynamicSkinHelpers.cs", ImportAssetOptions.ForceUpdate);
+      AssetDatabase.ImportAsset(dynamicSkinInfo.assetInfo.modFolder + "/RuneFox_Utils.cs", ImportAssetOptions.ForceUpdate);
+
       //var HelperCode = new 
 
       foreach (var mod in dynamicSkinInfo.DynamicModifications)
