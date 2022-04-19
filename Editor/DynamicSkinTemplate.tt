@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using RuneFoxMods;
+using DynamicSkinBuilder;
 using MonoMod.RuntimeDetour;
 
 
@@ -17,15 +18,15 @@ namespace <#= dynamicSkin.modInfo.modName #>
   {
     ///////////////////////////////////////////////////////////
     /// Add Declerations of all Modifications here
-    <# foreach(var mod in dynamicSkin.DynamicModifications) {#>
-    Modification <#= mod.Prefab.name #>Modification;
-    <# } #>
+<# foreach(var mod in dynamicSkin.DynamicModifications) {#>
+    Modification <#= mod.skinDef.name + mod.prefab.name #>Modification;
+<# } #>
     ///
     ///////////////////////////////////////////////////////////
 
     ///////////////////////////////////////////////////////////
     /// Local Declarations
-    public static SkinDef SkinDef { get; private set; }
+    public static Dictionary<string, SkinDef> SkinDefs = new System.Collections.Generic.Dictionary<string, SkinDef>();
     private static GameObject LastModelObject;
 
     //private static readonly Dictionary<GameObject, Modification> appliedModificatons = new Dictionary<GameObject, Modification>();
@@ -51,37 +52,39 @@ namespace <#= dynamicSkin.modInfo.modName #>
     {
       //////////////////////////////////////////////////
       //Should Load all modifications here
-      <# foreach(var mod in dynamicSkin.DynamicModifications) {
-      //ModificationName = new Modification("PrefabName.prefab", "ParentName", "BodyName", false, assetBundle);
-      #>
-      <#= mod.Prefab.name #>Modification = new Modification("<#= mod.Prefab.name #>.prefab", "<#= mod.ParentBone.name #>", "<#= dynamicSkin.skinDef.bodyName #>", <#= mod.AffectsBaseModel #>, assetBundle);
-      <# } #>
-
-      <# foreach(var mod in dynamicSkin.DynamicModifications) { 
+<# foreach(var mod in dynamicSkin.DynamicModifications) {
+      //ModificationName = new Modification("PrefabName.prefab", "ParentName", "BodyName", "SkinNameToken" false, assetBundle);
+#>
+      <#= mod.skinDef.name + mod.prefab.name #>Modification = new Modification("<#= mod.prefab.name #>.prefab", "<#= mod.parentBone.name #>", "<#= mod.skinDef.bodyName #>", "<#=mod.skinDef.CreateNameToken(dynamicSkin.modInfo.author)#>", <#= mod.affectsBaseModel?"true":"false"  #>, assetBundle);
+<# } #>
+      
+<# foreach(var mod in dynamicSkin.DynamicModifications) { 
       //ModificationName.dynamicBoneData = null; //get from DB reader
-      #>
-      <#= mod.Prefab.name #>Modification.dynamicBoneData = <#= DynamicBoneReader.CreateConstructor(mod.DynamicBone) #>
-      <# } #>
+#>
+      <#= mod.skinDef.name + mod.prefab.name #>Modification.dynamicBoneData = <#= DynamicBoneReader.CreateConstructor(mod.dynamicBone) #>
+<# } #>
 
       //add mods to mod list
-      <# foreach(var mod in dynamicSkin.DynamicModifications) { 
+<# foreach(var mod in dynamicSkin.DynamicModifications) { 
       //ModificationList.Add(ModificationName);
-      #>
-      ModificationList.Add(<#= mod.Prefab.name #>Modification);
-      <# } #>
+#>
+      ModificationList.Add(<#= mod.skinDef.name + mod.prefab.name #>Modification);
+<# } #>
       //Should Load all modifications here
       //////////////////////////////////////////////////
     }
 
     //Name for this is generated from the skinDef generator
-    static partial void <#= dynamicSkin.skinDef.bodyName.ToUpperCamelCase() #><#= dynamicSkin.skinDef.name.ToUpperCamelCase()#>SkinAdded (SkinDef skinDef, GameObject bodyPrefab)
+<# foreach(var skin in dynamicSkin.skinDefs) { #>
+    static partial void <#= skin.bodyName.ToUpperCamelCase() #><#= skin.name.ToUpperCamelCase()#>SkinAdded (SkinDef skinDef, GameObject bodyPrefab)
     {
-      SkinDef = skinDef;
+      SkinDefs.Add(skinDef.nameToken, skinDef);
     }
+<# } #>
 
 
 
-    ////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
     ////// Local Functions (these should not need to be changed when added to different skins)
     
     //private static void SkinDefApply(On.RoR2.SkinDef.orig_Apply orig, SkinDef self, GameObject modelObject) //Old SkinDefApply for use w/ mmhook
@@ -90,13 +93,16 @@ namespace <#= dynamicSkin.modInfo.modName #>
       orig(self, modelObject);
 
       RemoveInvalidModelObjects();
-
+      
       ModifiedObjects.TryGetValue(modelObject, out var modificatons);
-
+      
       try
       {
+
         //if we are on another character/skin
-        if (self != SkinDef)
+        SkinDef test;
+        var found = SkinDefs.TryGetValue(self.nameToken, out test);
+        if(!found)
         {
           if (modificatons != null)
           {
@@ -112,7 +118,7 @@ namespace <#= dynamicSkin.modInfo.modName #>
           //create new Applied Entry and pass into Apply
           AppliedModifications NewMods = new AppliedModifications();
           ModifiedObjects.Add(modelObject, NewMods);
-          ApplySkinModifications(modelObject, NewMods);
+          ApplySkinModifications(self, modelObject, NewMods);
         }
       }
       catch (Exception e)
@@ -157,14 +163,15 @@ namespace <#= dynamicSkin.modInfo.modName #>
       ModifiedObjects.Remove(modelObject);
     }
 
-    private static void ApplySkinModifications(GameObject modelObject, AppliedModifications modifications)
+    private static void ApplySkinModifications(SkinDef skindef, GameObject modelObject, AppliedModifications modifications)
     {
       var characterModel = modelObject.GetComponent<CharacterModel>();
 
       LastModelObject = modelObject;
       foreach (var mod in ModificationList)
       {
-        ApplyModification(modelObject, characterModel, mod, modifications);
+        if(mod.parentSkinToken == skindef.nameToken)
+          ApplyModification(modelObject, characterModel, mod, modifications);
       }
     }
 
@@ -403,11 +410,12 @@ namespace <#= dynamicSkin.modInfo.modName #>
     class Modification
     {
 
-      public Modification(string PrefabPath, string ParentName, string BodyName, bool AffectsBaseModel, AssetBundle assetBundle)
+      public Modification(string PrefabPath, string ParentName, string BodyName, string ParentSkinToken, bool AffectsBaseModel, AssetBundle assetBundle)
       {
         bodyname = BodyName;
         prefabpath = PrefabPath;
         parentname = ParentName;
+        parentSkinToken = ParentSkinToken;
         affectsbasemodel = AffectsBaseModel;
         prefab = assetBundle.LoadAsset<GameObject>(@prefabpath);
         if (prefab == null) { Debug.LogWarning("Asset at " + PrefabPath + " was not loaded"); } //DEBUG check for if asset was not loaded
@@ -422,7 +430,7 @@ namespace <#= dynamicSkin.modInfo.modName #>
       public bool affectsbasemodel; //if the modification affects the base model then we need to do additional steps
       //TODO: Add Support for multiple Dynamic Bone Scripts per modification
       public DynamicBoneData dynamicBoneData;
-
+      public string parentSkinToken;
       /// 
       //////////////////////////////////////////////////////
 

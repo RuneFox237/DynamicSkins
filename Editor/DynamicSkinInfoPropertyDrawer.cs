@@ -26,7 +26,7 @@ namespace DynamicSkinBuilder.CustomEditors
 
       if (dynamicSkinInfo.assetInfo == null) dynamicSkinInfo.InitializeAssetInfo();
 
-      var path = Path.Combine(dynamicSkinInfo.assetInfo.modFolder, dynamicSkinInfo.skinDef.name + "DynamicSkin.cs");
+      var path = Path.Combine(dynamicSkinInfo.assetInfo.modFolder, dynamicSkinInfo.modInfo.name + "DynamicSkin.cs");
       //dynamicSkinInfo.assetInfo.CreateNecessaryAssetsAndFillPaths(dynamicSkinInfo.modInfo.regenerateAssemblyDefinition);
       var DynamicSkinCode = new DynamicSkinTemplate(dynamicSkinInfo);
       File.WriteAllText(path, DynamicSkinCode.TransformText());
@@ -42,10 +42,10 @@ namespace DynamicSkinBuilder.CustomEditors
 
       foreach (var mod in dynamicSkinInfo.DynamicModifications)
       {
-        var found = dynamicSkinInfo.modInfo.additionalResources.Exists(x => x.name == mod.Prefab.name);
+        var found = dynamicSkinInfo.modInfo.additionalResources.Exists(x => x.name == mod.prefab.name);
         if (!found)
         {
-          dynamicSkinInfo.modInfo.additionalResources.Add(mod.Prefab);
+          dynamicSkinInfo.modInfo.additionalResources.Add(mod.prefab);
         }
       }
 

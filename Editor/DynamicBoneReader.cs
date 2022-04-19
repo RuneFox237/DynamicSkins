@@ -34,15 +34,15 @@ namespace DynamicSkinBuilder
   
     static string PrintColliders(List<DynamicBoneColliderBase> colliders)
     {
-      string str = "\nnew List<DynamicBoneColliderData>() {";
+      string str = "\r\nnew List<DynamicBoneColliderData>() {";
       foreach (var coll in colliders)
       {
-        str += "\n  " + PrintCollider(coll) + ", ";
+        str += "\r\n  " + PrintCollider(coll) + ", ";
       }
       if (colliders.Count != 0)
       {
         str = str.Remove(str.Length - 2);
-        str += "\n";
+        str += "\r\n";
       }
       str += "}";
       return str;

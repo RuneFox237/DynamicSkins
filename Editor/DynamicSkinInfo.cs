@@ -8,7 +8,8 @@ using RoRSkinBuilder.Data;
 [AddComponentMenu("RoR Skins/Dynamic Skin Info")]
 public class DynamicSkinInfo : MonoBehaviour
 {
-  public SkinDefinition skinDef;
+  [SerializeField] 
+  public List<SkinDefinition> skinDefs = new List<SkinDefinition>();
   public SkinModInfo modInfo;
 
   public AssetsInfo assetInfo;
@@ -16,15 +17,15 @@ public class DynamicSkinInfo : MonoBehaviour
   [SerializeField]
   public List<DynamicModification> DynamicModifications = new List<DynamicModification>();
 
-  public DynamicSkinInfo(SkinModInfo modinfo_, SkinDefinition skindef_)
+  public DynamicSkinInfo(SkinModInfo modinfo_, List<SkinDefinition> skindef_)
   {
-    skinDef = skindef_;
+    skinDefs = skindef_;
     modInfo = modinfo_;
     assetInfo = new AssetsInfo(modinfo_);
   }
   public DynamicSkinInfo(DynamicSkinInfo dynamicSkinInfo_)
   {
-    skinDef = dynamicSkinInfo_.skinDef;
+    skinDefs = new List<SkinDefinition>(dynamicSkinInfo_.skinDefs);
     modInfo = dynamicSkinInfo_.modInfo;
     assetInfo = new AssetsInfo(modInfo);
   }
@@ -36,11 +37,11 @@ public class DynamicSkinInfo : MonoBehaviour
 
   [Serializable]
   public class DynamicModification
-  
   {
-    public GameObject Prefab;
-    public DynamicBone DynamicBone;
-    public GameObject ParentBone;
-    public bool AffectsBaseModel = true;
+    public GameObject prefab;
+    public DynamicBone dynamicBone;
+    public GameObject parentBone;
+    public SkinDefinition skinDef;
+    public bool affectsBaseModel = true;
   }
 }
