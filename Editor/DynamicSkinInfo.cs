@@ -8,8 +8,7 @@ using RoRSkinBuilder.Data;
 [AddComponentMenu("RoR Skins/Dynamic Skin Info")]
 public class DynamicSkinInfo : MonoBehaviour
 {
-  [SerializeField] 
-  public List<SkinDefinition> skinDefs = new List<SkinDefinition>();
+  internal List<SkinDefinition> skinDefs = new List<SkinDefinition>();
   public SkinModInfo modInfo;
 
   public AssetsInfo assetInfo;
@@ -33,7 +32,19 @@ public class DynamicSkinInfo : MonoBehaviour
   public void InitializeAssetInfo()
   {
     assetInfo = new AssetsInfo(modInfo);
-  }
+
+    skinDefs.Clear();
+    foreach(var modification in DynamicModifications)
+    {
+
+      if (!skinDefs.Exists(x => x.GetHashCode() == modification.skinDef.GetHashCode()))
+      {
+        skinDefs.Add(modification.skinDef);
+      }
+
+    }
+
+  } 
 
   [Serializable]
   public class DynamicModification
