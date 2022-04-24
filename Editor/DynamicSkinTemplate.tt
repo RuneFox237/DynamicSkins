@@ -12,7 +12,7 @@ using MonoMod.RuntimeDetour;
 
 
 //NameSpace and SkinName are generated from SkinDef Generator
-namespace <#= dynamicSkin.modInfo.modName #>
+namespace <#= dynamicSkin.assetInfo.uccModName #>
 {
   public partial class <#= dynamicSkin.assetInfo.uccModName #>Plugin 
   {

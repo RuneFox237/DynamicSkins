@@ -42,7 +42,7 @@ using MonoMod.RuntimeDetour;
 namespace ");
             
             #line 15 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(dynamicSkin.modInfo.modName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(dynamicSkin.assetInfo.uccModName));
             
             #line default
             #line hidden
