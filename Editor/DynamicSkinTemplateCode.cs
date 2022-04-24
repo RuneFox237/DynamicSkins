@@ -7,9 +7,8 @@ namespace DynamicSkinBuilder
 {
   public partial class DynamicSkinTemplate
   {
-    private DynamicSkinInfo dynamicSkin;
-    public DynamicSkinTemplate(DynamicSkinInfo skin) { dynamicSkin = skin;}
+    private DynamicSkinInfo info;
+    public DynamicSkinTemplate(DynamicSkinInfo dynamicSkinInfo) { info = dynamicSkinInfo; }
   }
 
 }
-

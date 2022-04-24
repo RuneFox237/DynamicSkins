@@ -12,15 +12,17 @@ using MonoMod.RuntimeDetour;
 
 
 //NameSpace and SkinName are generated from SkinDef Generator
-namespace <#= dynamicSkin.assetInfo.uccModName #>
+namespace <#= info.assetInfo.uccModName #>
 {
-  public partial class <#= dynamicSkin.assetInfo.uccModName #>Plugin 
+  public partial class <#= info.assetInfo.uccModName #>Plugin 
   {
     ///////////////////////////////////////////////////////////
     /// Add Declerations of all Modifications here
-<# foreach(var mod in dynamicSkin.DynamicModifications) {#>
-    Modification <#= mod.skinDef.name + mod.prefab.name #>Modification;
-<# } #>
+<#  foreach(var skin in info.dynamicSkins) { 
+    foreach(var mod in skin.modifications) {#>
+    Modification <#= skin.skinDef.name + mod.prefab.name #>Modification;
+<#    } 
+   } #>
     ///
     ///////////////////////////////////////////////////////////
 
@@ -52,31 +54,37 @@ namespace <#= dynamicSkin.assetInfo.uccModName #>
     {
       //////////////////////////////////////////////////
       //Should Load all modifications here
-<# foreach(var mod in dynamicSkin.DynamicModifications) {
+<#  foreach(var skin in info.dynamicSkins) { 
+    foreach(var mod in skin.modifications) {
       //ModificationName = new Modification("PrefabName.prefab", "ParentName", "BodyName", "SkinNameToken" false, assetBundle);
 #>
-      <#= mod.skinDef.name + mod.prefab.name #>Modification = new Modification("<#= mod.prefab.name #>.prefab", "<#= mod.parentBone.name #>", "<#= mod.skinDef.bodyName #>", "<#=mod.skinDef.CreateNameToken(dynamicSkin.modInfo.author)#>", <#= mod.affectsBaseModel?"true":"false"  #>, assetBundle);
-<# } #>
+      <#= skin.skinDef.name + mod.prefab.name #>Modification = new Modification("<#= mod.prefab.name #>.prefab", "<#= mod.parentBone.name #>", "<#= skin.skinDef.bodyName #>", "<#=skin.skinDef.CreateNameToken(info.modInfo.author)#>", <#= mod.affectsBaseModel?"true":"false"  #>, assetBundle);
+<#   }
+  } #>
       
-<# foreach(var mod in dynamicSkin.DynamicModifications) { 
-      //ModificationName.dynamicBoneData = null; //get from DB reader
+<#  foreach(var skin in info.dynamicSkins) { 
+    foreach(var mod in skin.modifications) {
+    //ModificationName.dynamicBoneData = null; //get from DB reader
 #>
-      <#= mod.skinDef.name + mod.prefab.name #>Modification.dynamicBoneData = <#= DynamicBoneReader.CreateConstructor(mod.dynamicBone) #>
-<# } #>
+      <#= skin.skinDef.name + mod.prefab.name #>Modification.dynamicBoneData = <#= DynamicBoneReader.CreateConstructor(mod.dynamicBone) #>
+<# }
+}#>
 
       //add mods to mod list
-<# foreach(var mod in dynamicSkin.DynamicModifications) { 
+<#  foreach(var skin in info.dynamicSkins) { 
+    foreach(var mod in skin.modifications) {
       //ModificationList.Add(ModificationName);
 #>
-      ModificationList.Add(<#= mod.skinDef.name + mod.prefab.name #>Modification);
-<# } #>
+      ModificationList.Add(<#= skin.skinDef.name + mod.prefab.name #>Modification);
+<# }
+}#>
       //Should Load all modifications here
       //////////////////////////////////////////////////
     }
 
     //Name for this is generated from the skinDef generator
-<# foreach(var skin in dynamicSkin.skinDefs) { #>
-    static partial void <#= skin.bodyName.ToUpperCamelCase() #><#= skin.name.ToUpperCamelCase()#>SkinAdded (SkinDef skinDef, GameObject bodyPrefab)
+<# foreach(var skin in info.dynamicSkins) { #>
+    static partial void <#= skin.skinDef.bodyName.ToUpperCamelCase() #><#= skin.skinDef.name.ToUpperCamelCase()#>SkinAdded (SkinDef skinDef, GameObject bodyPrefab)
     {
       SkinDefs.Add(skinDef.nameToken, skinDef);
     }

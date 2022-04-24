@@ -42,14 +42,14 @@ using MonoMod.RuntimeDetour;
 namespace ");
             
             #line 15 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(dynamicSkin.assetInfo.uccModName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(info.assetInfo.uccModName));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n  public partial class ");
             
             #line 17 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(dynamicSkin.assetInfo.uccModName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(info.assetInfo.uccModName));
             
             #line default
             #line hidden
@@ -57,21 +57,23 @@ namespace ");
                     "  /// Add Declerations of all Modifications here\r\n");
             
             #line 21 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
- foreach(var mod in dynamicSkin.DynamicModifications) {
+  foreach(var skin in info.dynamicSkins) { 
+    foreach(var mod in skin.modifications) {
             
             #line default
             #line hidden
             this.Write("    Modification ");
             
-            #line 22 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(mod.skinDef.name + mod.prefab.name));
+            #line 23 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
             
             #line default
             #line hidden
             this.Write("Modification;\r\n");
             
-            #line 23 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
- } 
+            #line 24 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+    } 
+   } 
             
             #line default
             #line hidden
@@ -108,8 +110,9 @@ namespace ");
       //Should Load all modifications here
 ");
             
-            #line 55 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
- foreach(var mod in dynamicSkin.DynamicModifications) {
+            #line 57 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+  foreach(var skin in info.dynamicSkins) { 
+    foreach(var mod in skin.modifications) {
       //ModificationName = new Modification("PrefabName.prefab", "ParentName", "BodyName", "SkinNameToken" false, assetBundle);
 
             
@@ -117,87 +120,91 @@ namespace ");
             #line hidden
             this.Write("      ");
             
-            #line 58 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(mod.skinDef.name + mod.prefab.name));
+            #line 61 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
             
             #line default
             #line hidden
             this.Write("Modification = new Modification(\"");
             
-            #line 58 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            #line 61 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(mod.prefab.name));
             
             #line default
             #line hidden
             this.Write(".prefab\", \"");
             
-            #line 58 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            #line 61 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(mod.parentBone.name));
             
             #line default
             #line hidden
             this.Write("\", \"");
             
-            #line 58 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(mod.skinDef.bodyName));
+            #line 61 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.bodyName));
             
             #line default
             #line hidden
             this.Write("\", \"");
             
-            #line 58 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(mod.skinDef.CreateNameToken(dynamicSkin.modInfo.author)));
+            #line 61 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.CreateNameToken(info.modInfo.author)));
             
             #line default
             #line hidden
             this.Write("\", ");
             
-            #line 58 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            #line 61 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(mod.affectsBaseModel?"true":"false"));
             
             #line default
             #line hidden
             this.Write(", assetBundle);\r\n");
             
-            #line 59 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
- } 
+            #line 62 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+   }
+  } 
             
             #line default
             #line hidden
             this.Write("      \r\n");
             
-            #line 61 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
- foreach(var mod in dynamicSkin.DynamicModifications) { 
-      //ModificationName.dynamicBoneData = null; //get from DB reader
+            #line 65 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+  foreach(var skin in info.dynamicSkins) { 
+    foreach(var mod in skin.modifications) {
+    //ModificationName.dynamicBoneData = null; //get from DB reader
 
             
             #line default
             #line hidden
             this.Write("      ");
             
-            #line 64 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(mod.skinDef.name + mod.prefab.name));
+            #line 69 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
             
             #line default
             #line hidden
             this.Write("Modification.dynamicBoneData = ");
             
-            #line 64 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            #line 69 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(DynamicBoneReader.CreateConstructor(mod.dynamicBone)));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 65 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
- } 
+            #line 70 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+ }
+}
             
             #line default
             #line hidden
             this.Write("\r\n      //add mods to mod list\r\n");
             
-            #line 68 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
- foreach(var mod in dynamicSkin.DynamicModifications) { 
+            #line 74 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+  foreach(var skin in info.dynamicSkins) { 
+    foreach(var mod in skin.modifications) {
       //ModificationList.Add(ModificationName);
 
             
@@ -205,15 +212,16 @@ namespace ");
             #line hidden
             this.Write("      ModificationList.Add(");
             
-            #line 71 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(mod.skinDef.name + mod.prefab.name));
+            #line 78 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
             
             #line default
             #line hidden
             this.Write("Modification);\r\n");
             
-            #line 72 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
- } 
+            #line 79 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+ }
+}
             
             #line default
             #line hidden
@@ -221,28 +229,28 @@ namespace ");
                     "///////////////////\r\n    }\r\n\r\n    //Name for this is generated from the skinDef " +
                     "generator\r\n");
             
-            #line 78 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
- foreach(var skin in dynamicSkin.skinDefs) { 
+            #line 86 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+ foreach(var skin in info.dynamicSkins) { 
             
             #line default
             #line hidden
             this.Write("    static partial void ");
             
-            #line 79 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(skin.bodyName.ToUpperCamelCase()));
+            #line 87 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.bodyName.ToUpperCamelCase()));
             
             #line default
             #line hidden
             
-            #line 79 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(skin.name.ToUpperCamelCase()));
+            #line 87 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name.ToUpperCamelCase()));
             
             #line default
             #line hidden
             this.Write("SkinAdded (SkinDef skinDef, GameObject bodyPrefab)\r\n    {\r\n      SkinDefs.Add(ski" +
                     "nDef.nameToken, skinDef);\r\n    }\r\n");
             
-            #line 83 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            #line 91 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
  } 
             
             #line default

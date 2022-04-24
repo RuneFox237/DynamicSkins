@@ -70,12 +70,15 @@ namespace DynamicSkinBuilder.CustomEditors
       AssetDatabase.ImportAsset(dynamicSkinInfo.assetInfo.modFolder + "/RuneFox_Utils.cs", ImportAssetOptions.ForceUpdate);
 
 
-      foreach (var mod in dynamicSkinInfo.DynamicModifications)
+      foreach (var skin in dynamicSkinInfo.dynamicSkins)
       {
-        var found = dynamicSkinInfo.modInfo.additionalResources.Exists(x => x.GetHashCode() == mod.prefab.GetHashCode());
-        if (!found)
+        foreach(var mod in skin.modifications)
         {
-          dynamicSkinInfo.modInfo.additionalResources.Add(mod.prefab);
+          var found = dynamicSkinInfo.modInfo.additionalResources.Exists(x => x.GetHashCode() == mod.prefab.GetHashCode());
+          if (!found)
+          {
+            dynamicSkinInfo.modInfo.additionalResources.Add(mod.prefab);
+          }
         }
       }
 
