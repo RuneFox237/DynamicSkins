@@ -8,67 +8,7 @@ using DynamicSkinBuilder;
 
 namespace DynamicSkinBuilder.CustomEditors
 {
-  public class CopyDBasmdef : Editor
-  {
-    //[MenuItem("Assets/Create/DynamicSkins/Set Api Compatability Level", false, 1)]
-    //static void SetNetCompat()
-    //{
-    //  //UnityEditor.PlayerSettings.SetApiCompatibilityLevel(BuildTargetGroup.Unknown, ApiCompatibilityLevel.NET_4_6);
-    //  Debug.Log(UnityEditor.PlayerSettings.GetApiCompatibilityLevel(BuildTargetGroup.Standalone));
-    //
-    //}
 
-    [MenuItem("Assets/Create/DynamicSkins/Create DynamicBones.asmdef",false,1)]
-    static void TryMove()
-    {
-      //Debug.Log(AssetDatabase.GetAssetPath(Selection.activeObject.GetInstanceID()));
-      var path = AssetDatabase.GetAssetPath(Selection.activeObject.GetInstanceID());
-
-      //bool TryZip = false;
-      //bool TryManaged = false;
-      //
-      //try //if DynamicSkins was added from zip
-      //{
-      //  File.Copy("Packages/com.runefox237.dynamicskinbuilder/Editor/DynamicBones~/DynamicBones.asmdef", path + "/DynamicBones.asmdef", true);
-      //  File.Copy("Packages/com.runefox237.dynamicskinbuilder/Editor/DynamicBones~/DynamicBones.asmdef.meta", path + "/DynamicBones.asmdef.meta", true);
-      //}
-      //catch
-      //{
-      //  TryZip = true;//An exception has occured
-      //}
-      //
-      //try //if DynamicSkins was added from package manager
-      //{
-      //  File.Copy("Packages/com.runefox237.dynamicskinbuilder/Editor/DynamicBones~/DynamicBones.asmdef", AssetDatabase.GetAssetPath(Selection.activeObject.GetInstanceID()) + "/DynamicSkins.asmdef", true);
-      //  File.Copy("Packages/com.runefox237.dynamicskinbuilder/Editor/DynamicBones~/DynamicBones.asmdef.meta", AssetDatabase.GetAssetPath(Selection.activeObject.GetInstanceID()) + "/DynamicSkins.asmdef.meta", true);
-      //}
-      //catch
-      //{
-      //  TryManaged = true;//An exception has occured
-      //}
-      //
-      //if (TryManaged && TryZip)
-      //{
-      //  Debug.LogError("Error when creating DynamicBones.asmdef");
-      //}
-
-      File.Copy("Packages/com.runefox237.dynamicskinbuilder/Editor/DynamicBones~/DynamicBones.asmdef", path + "/DynamicBones.asmdef", true);
-      File.Copy("Packages/com.runefox237.dynamicskinbuilder/Editor/DynamicBones~/DynamicBones.asmdef.meta", path + "/DynamicBones.asmdef.meta", true);
-
-
-      AssetDatabase.StartAssetEditing();
-      AssetDatabase.ImportAsset(path + "/DynamicBones.asmdef", ImportAssetOptions.ForceUpdate);
-      AssetDatabase.ImportAsset(path + "/DynamicBones.asmdef.meta", ImportAssetOptions.ForceUpdate);
-      AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-      AssetDatabase.StopAssetEditing();
-
-
-      //AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-      //AssetDatabase.ImportAsset(dynamicSkinInfo.assetInfo.modFolder + "/DynamicSkinHelpers.cs", ImportAssetOptions.ForceUpdate);
-      //AssetDatabase.ImportAsset(dynamicSkinInfo.assetInfo.modFolder + "/RuneFox_Utils.cs", ImportAssetOptions.ForceUpdate);
-
-    }
-  }
 
   [CustomEditor(typeof(DynamicSkinInfo))]
   public class DynamicSkinInfoEditor : Editor
