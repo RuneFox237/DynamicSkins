@@ -1,5 +1,7 @@
 ﻿<#@ import namespace="RoRSkinBuilder.Data" #>
 <#@ import namespace="RoRSkinBuilder" #>
+<#@ import namespace="DynamicSkinBuilder" #>
+<#@ import namespace="UnityEngine" #>
 using BepInEx.Logging;
 using RoR2;
 using System;
@@ -32,7 +34,7 @@ namespace <#= info.assetInfo.uccModName #>
     private static GameObject LastModelObject;
 
     //private static readonly Dictionary<GameObject, Modification> appliedModificatons = new Dictionary<GameObject, Modification>();
-    private static List<Modification> ModificationList = new List<Modification>();//storage for modifications
+    private static Dictionary<string, SortedList<int, Modification>> ModificationList = new Dictionary<string, SortedList<int, Modification>>();//storage for modifications
     private static Dictionary<GameObject, AppliedModifications> ModifiedObjects = new Dictionary<GameObject, AppliedModifications>();
 
     //This uses Name of class 
@@ -54,11 +56,12 @@ namespace <#= info.assetInfo.uccModName #>
     {
       //////////////////////////////////////////////////
       //Should Load all modifications here
-<#  foreach(var skin in info.dynamicSkins) { 
+<#  foreach(var skin in info.dynamicSkins) {
     foreach(var mod in skin.modifications) {
+    var rend = DynamicSkinHelpers.GetTopParent(mod.parentBone.transform).GetComponentInChildren<SkinnedMeshRenderer>();
       //ModificationName = new Modification("PrefabName.prefab", "ParentName", "BodyName", "SkinNameToken" false, assetBundle);
 #>
-      <#= skin.skinDef.name + mod.prefab.name #>Modification = new Modification("<#= mod.prefab.name #>.prefab", "<#= mod.parentBone.name #>", "<#= skin.skinDef.bodyName #>", "<#=skin.skinDef.CreateNameToken(info.modInfo.author)#>", <#= mod.affectsBaseModel?"true":"false"  #>, assetBundle);
+      <#= skin.skinDef.name + mod.prefab.name #>Modification = new Modification("<#= mod.prefab.name #>.prefab", "<#= mod.parentBone.name #>", "<#= skin.skinDef.bodyName #>", "<#=skin.skinDef.CreateNameToken(info.modInfo.author)#>", <#=DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend)#>, <#= mod.affectsBaseModel?"true":"false"  #>, assetBundle);
 <#   }
   } #>
       
@@ -71,13 +74,24 @@ namespace <#= info.assetInfo.uccModName #>
 }#>
 
       //add mods to mod list
-<#  foreach(var skin in info.dynamicSkins) { 
-    foreach(var mod in skin.modifications) {
+<#  foreach(var skin in info.dynamicSkins) { #> 
+      ModificationList.Add("<#= skin.skinDef.CreateNameToken(info.modInfo.author) #>",
+        new SortedList<int, Modification>() {
+<#    for(int i = 0; i< skin.modifications.Count; i++) {
+      var mod = skin.modifications[i];
+      var rend = DynamicSkinHelpers.GetTopParent(mod.parentBone.transform).GetComponentInChildren<SkinnedMeshRenderer>();
+
       //ModificationList.Add(ModificationName);
 #>
-      ModificationList.Add(<#= skin.skinDef.name + mod.prefab.name #>Modification);
-<# }
-}#>
+          {<#=DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend)#>, <#= skin.skinDef.name + mod.prefab.name #>Modification}<#if(i < skin.modifications.Count - 1){#>,
+<#}#>
+<#}#>
+
+        }
+      );
+      
+<# } #>
+
       //Should Load all modifications here
       //////////////////////////////////////////////////
     }
@@ -176,10 +190,13 @@ namespace <#= info.assetInfo.uccModName #>
       var characterModel = modelObject.GetComponent<CharacterModel>();
 
       LastModelObject = modelObject;
-      foreach (var mod in ModificationList)
+      SortedList<int, Modification> modlist;
+      if (ModificationList.TryGetValue(skindef.nameToken, out modlist))
       {
-        if(mod.parentSkinToken == skindef.nameToken)
-          ApplyModification(modelObject, characterModel, mod, modifications);
+        foreach (var mod in modlist)
+        {
+          ApplyModification(modelObject, characterModel, mod.Value, modifications);
+        }
       }
     }
 
@@ -216,13 +233,13 @@ namespace <#= info.assetInfo.uccModName #>
 
         var newBones = skinRenderers[0].bones.ToList();//assumption is that we find a skinrenderer here, if not then whoops
 
-        var newBoneIndex = DynamicSkinHelpers.FindBoneIndex2(parentBone, newBones);
+        //var newBoneIndex = DynamicSkinHelpers.FindBoneIndex2(parentBone, newBones);
         //insert new bones into array at end of array
         var modBoneArray = DynamicSkinHelpers.BoneArrayBuilder(modification.instance.transform);
-        newBones.InsertRange(newBoneIndex, modBoneArray);
+        newBones.InsertRange(modification.boneIndex, modBoneArray);
 
         //add index and bonecount to modification
-        modification.boneIndex = newBoneIndex;
+        //modification.boneIndex = newBoneIndex;
         modification.boneCount = modBoneArray.Length;
 
         //assign bones to skin renderers
@@ -232,7 +249,6 @@ namespace <#= info.assetInfo.uccModName #>
         }
 
         modifications.BaseModelModifications.Push(modification);
-
         /// Add Bones to Base Armature here
         ///////////////////////////////////////////////////////////
       }
@@ -418,13 +434,14 @@ namespace <#= info.assetInfo.uccModName #>
     class Modification
     {
 
-      public Modification(string PrefabPath, string ParentName, string BodyName, string ParentSkinToken, bool AffectsBaseModel, AssetBundle assetBundle)
+      public Modification(string PrefabPath, string ParentName, string BodyName, string ParentSkinToken, int BoneIndex, bool AffectsBaseModel, AssetBundle assetBundle)
       {
         bodyname = BodyName;
         prefabpath = PrefabPath;
         parentname = ParentName;
         parentSkinToken = ParentSkinToken;
         affectsbasemodel = AffectsBaseModel;
+        boneIndex = BoneIndex;
         prefab = assetBundle.LoadAsset<GameObject>(@prefabpath);
         if (prefab == null) { Debug.LogWarning("Asset at " + PrefabPath + " was not loaded"); } //DEBUG check for if asset was not loaded
       }
