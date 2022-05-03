@@ -227,30 +227,7 @@ namespace <#= info.assetInfo.uccModName #>
         modification.instance = newPart;
         modification.inst_armature = newPart; //the armature of the modifications that affect the base mode is the whole prefab
 
-        ///////////////////////////////////////////////////////////
-        /// Add Bones to Base Armature here
-        var skinRenderers = DynamicSkinHelpers.GetBaseSkinRenderers(modelObject);
-
-        var newBones = skinRenderers[0].bones.ToList();//assumption is that we find a skinrenderer here, if not then whoops
-
-        //var newBoneIndex = DynamicSkinHelpers.FindBoneIndex2(parentBone, newBones);
-        //insert new bones into array at end of array
-        var modBoneArray = DynamicSkinHelpers.BoneArrayBuilder(modification.instance.transform);
-        newBones.InsertRange(modification.boneIndex, modBoneArray);
-
-        //add index and bonecount to modification
-        //modification.boneIndex = newBoneIndex;
-        modification.boneCount = modBoneArray.Length;
-
-        //assign bones to skin renderers
-        foreach (var renderer in skinRenderers)
-        {
-          renderer.bones = newBones.ToArray();
-        }
-
-        modifications.BaseModelModifications.Push(modification);
-        /// Add Bones to Base Armature here
-        ///////////////////////////////////////////////////////////
+        ModificationApplyBones(modelObject, modification, modifications);
       }
       else
       {
@@ -260,11 +237,6 @@ namespace <#= info.assetInfo.uccModName #>
         modification.instance = newPart;
 
         var armature = DynamicSkinHelpers.GetArmature(newPart);
-
-        //if (armature == null)
-        //  Debug.Log("Armature not found");
-        //else
-        //  Debug.Log("armature found: " + armature.name);
 
         //then parent the armature to the parentboned
         armature.transform.SetParent(parentBone, false);
@@ -279,80 +251,116 @@ namespace <#= info.assetInfo.uccModName #>
       /// Things like DynamicBones Component, assigning values to dynamic bones component, adding DB_Colliders and editing them, etc.
       if(modification.dynamicBoneData != null)
       {
-      
-
-        //======================================
-        //Add Dynamic Bone Component
-        DynamicBone DB = modification.instance.AddComponent<DynamicBone>();
-        modification.inst_dynamicBone = DB;
-
-        //======================================
-        /// Add DynamicBones Colliders to other armature bones (Need to do this before Modifying Dynamic Bones component as we add them to the DB list during modification)
-        List<DynamicBoneCollider> bonelist = new List<DynamicBoneCollider>();
-
-        foreach (var colliderData in modification.dynamicBoneData.m_Colliders)
-        {
-          var parent = Utils.FindChildInTree(modelObject.transform, colliderData.m_parent_name);
-          //var parent = modelObject.transform.Find(ChildHelper.GetPath(bodyname, colliderData.m_parent_name));
-          
-          var bonecollider = parent.gameObject.AddComponent<DynamicBoneCollider>();
-
-          bonecollider.m_Direction = colliderData.m_Direction;
-          bonecollider.m_Center = colliderData.m_Center;
-          bonecollider.m_Bound = colliderData.m_Bound;
-          bonecollider.m_Radius = colliderData.m_Radius;
-          bonecollider.m_Height = colliderData.m_Height;
-
-          bonelist.Add(bonecollider);
-        }
-
-        modification.inst_DB_colliders = bonelist;
-
-        //======================================
-        // Modify DynamicBones Component with data
-
-        var root = Utils.FindChildInTree(modification.inst_armature.transform, modification.dynamicBoneData.m_Root);
-
-        DB.m_Root = root;
-        DB.m_Damping = modification.dynamicBoneData.m_Damping;
-        DB.m_DampingDistrib = modification.dynamicBoneData.m_DampingDistrib;
-        DB.m_Elasticity = modification.dynamicBoneData.m_Elasticity;
-        DB.m_ElasticityDistrib = modification.dynamicBoneData.m_ElasticityDistrib;
-        DB.m_Stiffness = modification.dynamicBoneData.m_Stiffness;
-        DB.m_StiffnessDistrib = modification.dynamicBoneData.m_StiffnessDistrib;
-        DB.m_Inert = modification.dynamicBoneData.m_Inert;
-        DB.m_InertDistrib = modification.dynamicBoneData.m_InertDistrib;
-        DB.m_Radius = modification.dynamicBoneData.m_Radius;
-        DB.m_RadiusDistrib = modification.dynamicBoneData.m_RadiusDistrib;
-        DB.m_EndLength = modification.dynamicBoneData.m_EndLength;
-        DB.m_EndOffset = modification.dynamicBoneData.m_EndOffset;
-        DB.m_Gravity = modification.dynamicBoneData.m_Gravity;
-        DB.m_Force = modification.dynamicBoneData.m_Force;
-
-        DB.m_Colliders = bonelist;
-        DB.m_Exclusions = new List<Transform>();
-        foreach (var exclude in modification.dynamicBoneData.m_Exclusions)
-        {
-          //NOTE: Assumption here is that the dynamic bone root is part of the new armature and we are only excluding bones located in root
-          var transform = Utils.FindChildInTree(root, exclude);
-
-          if (transform != null)
-            DB.m_Exclusions.Add(transform);
-          else
-            Debug.LogWarning("Tried to exclude a transform that could not be found");
-        }
-
-
-        DB.m_FreezeAxis = modification.dynamicBoneData.m_FreezeAxis;
-
-        //TODO: Read DB and compare it to what's made in OG mod cause skirt is behaving oddly
-    
+        ModificationApplyDynamicBones(modelObject, modification);
       }
       /// Add dynamic bones stuff here
       ///////////////////////////////////////////////////////////
 
       ///////////////////////////////////////////////////////////
       /// Add renderers to the character's renderer list
+      ModificationAddRenderers(newPart, characterModel);
+      /// Add renderers to the character's renderer list
+      ///////////////////////////////////////////////////////////
+
+      //Push to applied modifications when done
+      modifications.OtherModifications.Add(modification);
+    }
+
+    static void ModificationApplyBones(GameObject modelObject, Modification modification, AppliedModifications modifications)
+    {
+      var skinRenderers = DynamicSkinHelpers.GetBaseSkinRenderers(modelObject);
+
+      var newBones = skinRenderers[0].bones.ToList();//assumption is that we find a skinrenderer here, if not then whoops
+
+      //var newBoneIndex = DynamicSkinHelpers.FindBoneIndex2(parentBone, newBones);
+      //insert new bones into array at end of array
+      var modBoneArray = DynamicSkinHelpers.BoneArrayBuilder(modification.instance.transform);
+      newBones.InsertRange(modification.boneIndex, modBoneArray);
+
+      //add index and bonecount to modification
+      //modification.boneIndex = newBoneIndex;
+      modification.boneCount = modBoneArray.Length;
+
+      //assign bones to skin renderers
+      foreach (var renderer in skinRenderers)
+      {
+        renderer.bones = newBones.ToArray();
+      }
+
+      modifications.BaseModelModifications.Push(modification);
+    }
+
+    static void ModificationApplyDynamicBones(GameObject modelObject, Modification modification)
+    {
+      //======================================
+      //Add Dynamic Bone Component
+      DynamicBone DB = modification.instance.AddComponent<DynamicBone>();
+      modification.inst_dynamicBone = DB;
+
+      //======================================
+      /// Add DynamicBones Colliders to other armature bones (Need to do this before Modifying Dynamic Bones component as we add them to the DB list during modification)
+      List<DynamicBoneCollider> bonelist = new List<DynamicBoneCollider>();
+
+      foreach (var colliderData in modification.dynamicBoneData.m_Colliders)
+      {
+        var parent = Utils.FindChildInTree(modelObject.transform, colliderData.m_parent_name);
+        //var parent = modelObject.transform.Find(ChildHelper.GetPath(bodyname, colliderData.m_parent_name));
+
+        var bonecollider = parent.gameObject.AddComponent<DynamicBoneCollider>();
+
+        bonecollider.m_Direction = colliderData.m_Direction;
+        bonecollider.m_Center = colliderData.m_Center;
+        bonecollider.m_Bound = colliderData.m_Bound;
+        bonecollider.m_Radius = colliderData.m_Radius;
+        bonecollider.m_Height = colliderData.m_Height;
+
+        bonelist.Add(bonecollider);
+      }
+
+      modification.inst_DB_colliders = bonelist;
+
+      //======================================
+      // Modify DynamicBones Component with data
+
+      var root = Utils.FindChildInTree(modification.inst_armature.transform, modification.dynamicBoneData.m_Root);
+
+      DB.m_Root = root;
+      DB.m_Damping = modification.dynamicBoneData.m_Damping;
+      DB.m_DampingDistrib = modification.dynamicBoneData.m_DampingDistrib;
+      DB.m_Elasticity = modification.dynamicBoneData.m_Elasticity;
+      DB.m_ElasticityDistrib = modification.dynamicBoneData.m_ElasticityDistrib;
+      DB.m_Stiffness = modification.dynamicBoneData.m_Stiffness;
+      DB.m_StiffnessDistrib = modification.dynamicBoneData.m_StiffnessDistrib;
+      DB.m_Inert = modification.dynamicBoneData.m_Inert;
+      DB.m_InertDistrib = modification.dynamicBoneData.m_InertDistrib;
+      DB.m_Radius = modification.dynamicBoneData.m_Radius;
+      DB.m_RadiusDistrib = modification.dynamicBoneData.m_RadiusDistrib;
+      DB.m_EndLength = modification.dynamicBoneData.m_EndLength;
+      DB.m_EndOffset = modification.dynamicBoneData.m_EndOffset;
+      DB.m_Gravity = modification.dynamicBoneData.m_Gravity;
+      DB.m_Force = modification.dynamicBoneData.m_Force;
+
+      DB.m_Colliders = bonelist;
+      DB.m_Exclusions = new List<Transform>();
+      foreach (var exclude in modification.dynamicBoneData.m_Exclusions)
+      {
+        //NOTE: Assumption here is that the dynamic bone root is part of the new armature and we are only excluding bones located in root
+        var transform = Utils.FindChildInTree(root, exclude);
+
+        if (transform != null)
+          DB.m_Exclusions.Add(transform);
+        else
+          Debug.LogWarning("Tried to exclude a transform that could not be found");
+      }
+
+
+      DB.m_FreezeAxis = modification.dynamicBoneData.m_FreezeAxis;
+
+      //TODO: Read DB and compare it to what's made in OG mod cause skirt is behaving oddly
+    }
+
+    static void ModificationAddRenderers(GameObject newPart, CharacterModel characterModel)
+    {
 
       //get renderers
       var renderers = newPart.GetComponentsInChildren<SkinnedMeshRenderer>(true);
@@ -383,11 +391,6 @@ namespace <#= info.assetInfo.uccModName #>
           i--; //decrement i to reach the next renederer
         }
       }
-      /// Add renderers to the character's renderer list
-      ///////////////////////////////////////////////////////////
-
-      //Push to applied modifications when done
-      modifications.OtherModifications.Add(modification);
     }
 
     private static void clearModification(Modification modification, GameObject modelObject, AppliedModifications modifications)
