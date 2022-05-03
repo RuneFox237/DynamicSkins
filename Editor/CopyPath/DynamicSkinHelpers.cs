@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DynamicSkinBuilder
 {
-  static class DynamicSkinHelpers
+  public static class DynamicSkinHelpers
   {
     ////////////////////////////////////////////////////////////////////////////
     ////// Utility Funcs
@@ -199,6 +199,51 @@ namespace DynamicSkinBuilder
         if (armature) return armature;
       }
       return null;
+    }
+
+    public static Transform GetTopParent(Transform obj)
+    {
+      Transform walker = obj;
+      while (walker.parent != null)
+      {
+        walker = walker.parent;
+      }
+
+      return walker;
+    }
+
+    public static string GetPrevBoneInList(Transform targetBone, SkinnedMeshRenderer meshRenderer)
+    {
+      var bonearray = meshRenderer.bones;
+      for (int i = 0; i <= bonearray.Length - 1; i++)
+      {
+        if (bonearray[i + 1].name == targetBone.name)
+          return bonearray[i].name;
+      }
+      return null;
+    }
+
+    public static int GetBoneIndexInList(Transform targetBone, SkinnedMeshRenderer meshRenderer)
+    {
+      var bonearray = meshRenderer.bones;
+      for (int i = 0; i <= bonearray.Length; i++)
+      {
+        //Debug.Log(targetBone.name + "   " + bonearray[i + 1].name);
+        if (bonearray[i].name == targetBone.name)
+          return i;
+      }
+      return -1;
+    }
+
+    public static int GetPrevBoneIndexInList(Transform targetBone, SkinnedMeshRenderer meshRenderer)
+    {
+      var bonearray = meshRenderer.bones;
+      for (int i = 0; i <= bonearray.Length - 1; i++)
+      {
+        if (bonearray[i + 1].name == targetBone.name)
+          return i;
+      }
+      return -1;
     }
 
     ////// Utility Funcs
