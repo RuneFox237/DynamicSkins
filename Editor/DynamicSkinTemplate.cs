@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace DynamicSkinBuilder
+namespace RuneFoxMods.DynamicSkinBuilder
 {
     using RoRSkinBuilder.Data;
     using RoRSkinBuilder;
@@ -18,561 +18,110 @@ namespace DynamicSkinBuilder
     /// <summary>
     /// Class to produce the template output
     /// </summary>
-    
-    #line 1 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
     public partial class DynamicSkinTemplate : DynamicSkinTemplateBase
     {
-#line hidden
         /// <summary>
         /// Create the template output
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write(@"using BepInEx.Logging;
-using RoR2;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using RuneFoxMods;
-using DynamicSkinBuilder;
-using MonoMod.RuntimeDetour;
-
-
-//NameSpace and SkinName are generated from SkinDef Generator
-namespace ");
-            
-            #line 17 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write("using RoR2;\r\nusing System;\r\nusing System.Collections.Generic;\r\nusing UnityEngine;" +
+                    "\r\nusing RuneFoxMods.DynamicSkins;\r\nusing MonoMod.RuntimeDetour;\r\n\r\n\r\n//NameSpace" +
+                    " and SkinName are generated from SkinDef Generator\r\nnamespace ");
             this.Write(this.ToStringHelper.ToStringWithCulture(info.assetInfo.uccModName));
-            
-            #line default
-            #line hidden
             this.Write("\r\n{\r\n  public partial class ");
-            
-            #line 19 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.assetInfo.uccModName));
-            
-            #line default
-            #line hidden
-            this.Write("Plugin \r\n  {\r\n    ///////////////////////////////////////////////////////////\r\n  " +
-                    "  /// Add Declerations of all Modifications here\r\n");
-            
-            #line 23 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write("Plugin \r\n  { \r\n    static DynamicSkin dynamicSkin = new DynamicSkin();\r\n\r\n    ///" +
+                    "////////////////////////////////////////////////////////\r\n    /// Add Decleratio" +
+                    "ns of all Modifications here\r\n");
   foreach(var skin in info.dynamicSkins) { 
     foreach(var mod in skin.modifications) {
-            
-            #line default
-            #line hidden
             this.Write("    Modification ");
-            
-            #line 25 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
-            
-            #line default
-            #line hidden
             this.Write("Modification;\r\n");
-            
-            #line 26 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
     } 
    } 
-            
-            #line default
-            #line hidden
             this.Write(@"    ///
     ///////////////////////////////////////////////////////////
-
-    ///////////////////////////////////////////////////////////
-    /// Local Declarations
-    public static Dictionary<string, SkinDef> SkinDefs = new System.Collections.Generic.Dictionary<string, SkinDef>();
-    private static GameObject LastModelObject;
-
-    //private static readonly Dictionary<GameObject, Modification> appliedModificatons = new Dictionary<GameObject, Modification>();
-    private static Dictionary<string, SortedList<int, Modification>> ModificationList = new Dictionary<string, SortedList<int, Modification>>();//storage for modifications
-    private static Dictionary<GameObject, AppliedModifications> ModifiedObjects = new Dictionary<GameObject, AppliedModifications>();
-
-    //This uses Name of class 
-    //private static SkinNamePlugin Instance { get; set; }
-    //private static ManualLogSource InstanceLogger => Instance?.Logger;
-    /// Local Declarations
-    ///////////////////////////////////////////////////////////
-
-
-    partial void BeforeStart()
+    
+    void DynamicSkinBeforeStart()
     {
-      Instance = this;
-
-      //On.RoR2.SkinDef.Apply += SkinDefApply; //Old hook for use w/ mmhook
-      new Hook(typeof(SkinDef).GetMethod(nameof(SkinDef.Apply)), (Action<Action<SkinDef, GameObject>, SkinDef, GameObject>) SkinDefApply).Apply();
+      dynamicSkin.InstanceLogger = Instance.Logger;
+      new Hook(typeof(SkinDef).GetMethod(nameof(SkinDef.Apply)), (Action<Action<SkinDef, GameObject>, SkinDef, GameObject>) dynamicSkin.SkinDefApply).Apply();
     }
 
-    partial void AfterStart()
+    void DynamicSkinAfterStart()
     {
-      //////////////////////////////////////////////////
-      //Should Load all modifications here
+      InitializeModifications();
+      InitializeDynamicBones();
+      AddModificationsToList();
+    }
+
+    static void DynamicSkinBeforeBodyCatalogInit()
+    {
 ");
-            
-            #line 59 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+  foreach(var skin in info.dynamicSkins) { 
+            this.Write("      ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.bodyName + skin.skinDef.name));
+            this.Write("SkinAddedEvent += onSkinAdded;\r\n");
+}
+            this.Write("    }\r\n\r\n    static void DynamicSkinAfterBodyCatalogInit(){}\r\n    \r\n    void Init" +
+                    "ializeModifications()\r\n    {\r\n");
   foreach(var skin in info.dynamicSkins) {
     foreach(var mod in skin.modifications) {
     var rend = DynamicSkinHelpers.GetTopParent(mod.parentBone.transform).GetComponentInChildren<SkinnedMeshRenderer>();
       //ModificationName = new Modification("PrefabName.prefab", "ParentName", "BodyName", "SkinNameToken" false, assetBundle);
 
-            
-            #line default
-            #line hidden
             this.Write("      ");
-            
-            #line 64 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
-            
-            #line default
-            #line hidden
             this.Write("Modification = new Modification(\"");
-            
-            #line 64 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(mod.prefab.name));
-            
-            #line default
-            #line hidden
             this.Write(".prefab\", \"");
-            
-            #line 64 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(mod.parentBone.name));
-            
-            #line default
-            #line hidden
             this.Write("\", \"");
-            
-            #line 64 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.bodyName));
-            
-            #line default
-            #line hidden
             this.Write("\", \"");
-            
-            #line 64 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.CreateNameToken(info.modInfo.author)));
-            
-            #line default
-            #line hidden
             this.Write("\", ");
-            
-            #line 64 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend)));
-            
-            #line default
-            #line hidden
             this.Write(", ");
-            
-            #line 64 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(mod.affectsBaseModel?"true":"false"));
-            
-            #line default
-            #line hidden
             this.Write(", assetBundle);\r\n");
-            
-            #line 65 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
    }
   } 
-            
-            #line default
-            #line hidden
-            this.Write("      \r\n");
-            
-            #line 68 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write("    }\r\n\r\n    void InitializeDynamicBones()\r\n    {\r\n");
   foreach(var skin in info.dynamicSkins) { 
     foreach(var mod in skin.modifications) {
     //ModificationName.dynamicBoneData = null; //get from DB reader
 
-            
-            #line default
-            #line hidden
             this.Write("      ");
-            
-            #line 72 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
-            
-            #line default
-            #line hidden
             this.Write("Modification.dynamicBoneData = ");
-            
-            #line 72 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(DynamicBoneReader.CreateConstructor(mod.dynamicBone)));
-            
-            #line default
-            #line hidden
             this.Write("\r\n");
-            
-            #line 73 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
  }
 }
-            
-            #line default
-            #line hidden
-            this.Write("\r\n      //add mods to mod list\r\n");
-            
-            #line 77 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write("    }\r\n\r\n    void AddModificationsToList()\r\n    {\r\n");
   foreach(var skin in info.dynamicSkins) { 
-            
-            #line default
-            #line hidden
-            this.Write(" \r\n      ModificationList.Add(\"");
-            
-            #line 78 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.CreateNameToken(info.modInfo.author)));
-            
-            #line default
-            #line hidden
-            this.Write("\",\r\n        new SortedList<int, Modification>() {\r\n");
-            
-            #line 80 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-    for(int i = 0; i< skin.modifications.Count; i++) {
+      for(int i = 0; i< skin.modifications.Count; i++) {
       var mod = skin.modifications[i];
-      var rend = DynamicSkinHelpers.GetTopParent(mod.parentBone.transform).GetComponentInChildren<SkinnedMeshRenderer>();
-
-      //ModificationList.Add(ModificationName);
-
-            
-            #line default
-            #line hidden
-            this.Write("          {");
-            
-            #line 86 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+      var rend = DynamicSkinHelpers.GetTopParent(mod.parentBone.transform).GetComponentInChildren<SkinnedMeshRenderer>(); 
+            this.Write("      dynamicSkin.AddModification(\"");
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.CreateNameToken(info.modInfo.author)));
+            this.Write("\", ");
             this.Write(this.ToStringHelper.ToStringWithCulture(DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend)));
-            
-            #line default
-            #line hidden
             this.Write(", ");
-            
-            #line 86 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
-            
-            #line default
-            #line hidden
-            this.Write("Modification}");
-            
-            #line 86 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-if(i < skin.modifications.Count - 1){
-            
-            #line default
-            #line hidden
-            this.Write(",\r\n");
-            
-            #line 87 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-}
-            
-            #line default
-            #line hidden
-            
-            #line 88 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-}
-            
-            #line default
-            #line hidden
-            this.Write("\r\n        }\r\n      );\r\n      \r\n");
-            
-            #line 93 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write("Modification);\r\n");
  } 
-            
-            #line default
-            #line hidden
-            this.Write("\r\n      //Should Load all modifications here\r\n      /////////////////////////////" +
-                    "/////////////////////\r\n    }\r\n\r\n    //Name for this is generated from the skinDe" +
-                    "f generator\r\n");
-            
-            #line 100 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
- foreach(var skin in info.dynamicSkins) { 
-            
-            #line default
-            #line hidden
-            this.Write("    static partial void ");
-            
-            #line 101 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.bodyName.ToUpperCamelCase()));
-            
-            #line default
-            #line hidden
-            
-            #line 101 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name.ToUpperCamelCase()));
-            
-            #line default
-            #line hidden
-            this.Write("SkinAdded (SkinDef skinDef, GameObject bodyPrefab)\r\n    {\r\n      SkinDefs.Add(ski" +
-                    "nDef.nameToken, skinDef);\r\n    }\r\n");
-            
-            #line 105 "C:\Users\kamba\Desktop\ROR2 Modding\MyCustomMods\Other\MyScripts\DynamicSkins\DynamicSkinsScripts\DynamicSkinsBuilder\DynamicSkinBuilder\DynamicSkinBuilder\DynamicSkinTemplate.tt"
+            this.Write("    \r\n");
  } 
-            
-            #line default
-            #line hidden
-            this.Write("\r\n\r\n\r\n///////////////////////////////////////////////////////////////////////////" +
-                    "/\r\n    ////// Local Functions (these should not need to be changed when added to" +
-                    " different skins)\r\n    \r\n    //private static void SkinDefApply(On.RoR2.SkinDef." +
-                    "orig_Apply orig, SkinDef self, GameObject modelObject) //Old SkinDefApply for us" +
-                    "e w/ mmhook\r\n    private static void SkinDefApply(Action<SkinDef, GameObject> or" +
-                    "ig, SkinDef self, GameObject modelObject)\r\n    {\r\n      orig(self, modelObject);" +
-                    "\r\n\r\n      RemoveInvalidModelObjects();\r\n      \r\n      ModifiedObjects.TryGetValu" +
-                    "e(modelObject, out var modificatons);\r\n      \r\n      try\r\n      {\r\n\r\n        //i" +
-                    "f we are on another character/skin\r\n        SkinDef test;\r\n        var found = S" +
-                    "kinDefs.TryGetValue(self.nameToken, out test);\r\n        if(!found)\r\n        {\r\n " +
-                    "         if (modificatons != null)\r\n          {\r\n            ClearSkinModificati" +
-                    "ons(LastModelObject, modificatons);\r\n          }\r\n          return;\r\n        }\r\n" +
-                    "\r\n        if (modificatons == null)\r\n        {\r\n          //otherwise if are now" +
-                    " applying modded skin and no modifcations have been made, then apply modificatio" +
-                    "ns\r\n\r\n          //create new Applied Entry and pass into Apply\r\n          Applie" +
-                    "dModifications NewMods = new AppliedModifications();\r\n          ModifiedObjects." +
-                    "Add(modelObject, NewMods);\r\n          ApplySkinModifications(self, modelObject, " +
-                    "NewMods);\r\n        }\r\n      }\r\n      catch (Exception e)\r\n      {\r\n        //err" +
-                    "or logging may need to be skin specific\r\n        InstanceLogger.LogWarning(\"An e" +
-                    "rror occured while adding accessories to a skin\");\r\n        InstanceLogger.LogEr" +
-                    "ror(e);\r\n      }\r\n\r\n      //print heiarchy\r\n      //Utils.readheiarchy(modelObje" +
-                    "ct);\r\n    }\r\n\r\n    private static void RemoveInvalidModelObjects()\r\n    {\r\n     " +
-                    " foreach (var modelObject in ModifiedObjects.Keys.Where(el => !el).ToList())\r\n  " +
-                    "    {\r\n        ModifiedObjects.Remove(modelObject);\r\n      }\r\n    }\r\n\r\n    priva" +
-                    "te static void ClearSkinModifications(GameObject modelObject, AppliedModificatio" +
-                    "ns modifications)\r\n    {\r\n      //NOTE: modifications that modify the base bone " +
-                    "list need to have their bones removed first before destruction\r\n      //Modifica" +
-                    "tions that modify the base bone list have to be removed in reverse order in orde" +
-                    "r to maintain correct indexing\r\n\r\n      //Clear Mods that modify base bone list," +
-                    " these need to be done in reverse order\r\n      while (modifications.BaseModelMod" +
-                    "ifications.Count != 0)\r\n      {\r\n        var mod = modifications.BaseModelModifi" +
-                    "cations.Pop();\r\n\r\n        clearModification(mod, modelObject, modifications);\r\n " +
-                    "     }\r\n\r\n      //clear rest of mods\r\n      while (modifications.OtherModificati" +
-                    "ons.Count != 0)\r\n      {\r\n        clearModification(modifications.OtherModificat" +
-                    "ions[0], modelObject, modifications); //clearmodification calls remove on applie" +
-                    "d Mod.\r\n      }\r\n    \r\n      //remove the object from modified once all mods are" +
-                    " cleared\r\n      ModifiedObjects.Remove(modelObject);\r\n    }\r\n\r\n    private stati" +
-                    "c void ApplySkinModifications(SkinDef skindef, GameObject modelObject, AppliedMo" +
-                    "difications modifications)\r\n    {\r\n      var characterModel = modelObject.GetCom" +
-                    "ponent<CharacterModel>();\r\n\r\n      LastModelObject = modelObject;\r\n      SortedL" +
-                    "ist<int, Modification> modlist;\r\n      if (ModificationList.TryGetValue(skindef." +
-                    "nameToken, out modlist))\r\n      {\r\n        foreach (var mod in modlist)\r\n       " +
-                    " {\r\n          ApplyModification(modelObject, characterModel, mod.Value, modifica" +
-                    "tions);\r\n        }\r\n      }\r\n    }\r\n\r\n    /// <summary>\r\n    /// \r\n    /// </sum" +
-                    "mary>\r\n    /// <param name=\"modelObject\">GameObject of ModelObject</param>\r\n    " +
-                    "/// <param name=\"modifications\">List for Storing Modifctions</param>\r\n    /// <p" +
-                    "aram name=\"characterModel\">Character Model of ModelObject</param>\r\n    /// <para" +
-                    "m name=\"modification\">Modification to be apllied</param>\r\n    private static voi" +
-                    "d ApplyModification(GameObject modelObject, CharacterModel characterModel, Modif" +
-                    "ication modification, AppliedModifications modifications)\r\n    {\r\n      //Get ar" +
-                    "amture bone that new prefab will be parented to\r\n      var bodyname = modificati" +
-                    "on.bodyname;\r\n      var parentname = modification.parentname;\r\n\r\n      var paren" +
-                    "tBone = Utils.FindChildInTree(modelObject.transform, parentname);\r\n      //var p" +
-                    "arentBone = modelObject.transform.Find(ChildHelper.GetPath(bodyname, parentname)" +
-                    ");\r\n\r\n      GameObject newPart;\r\n\r\n      //we have to instantiate the prefabs in" +
-                    " two different ways based on if they affect the model or not\r\n      if (modifica" +
-                    "tion.affectsbasemodel)\r\n      {\r\n        //instantiate the model\r\n        newPar" +
-                    "t = GameObject.Instantiate(modification.prefab, parentBone, false);\r\n        new" +
-                    "Part.name = Utils.RemoveCloneNaming(newPart.name);\r\n        modification.instanc" +
-                    "e = newPart;\r\n        modification.inst_armature = newPart; //the armature of th" +
-                    "e modifications that affect the base mode is the whole prefab\r\n\r\n        Modific" +
-                    "ationApplyBones(modelObject, modification, modifications);\r\n      }\r\n      else\r" +
-                    "\n      {\r\n        //instantiate it w/ model as parent\r\n        newPart = GameObj" +
-                    "ect.Instantiate(modification.prefab, modelObject.transform, false);\r\n        new" +
-                    "Part.name = Utils.RemoveCloneNaming(newPart.name);\r\n        modification.instanc" +
-                    "e = newPart;\r\n\r\n        var armature = DynamicSkinHelpers.GetArmature(newPart);\r" +
-                    "\n\r\n        //then parent the armature to the parentboned\r\n        armature.trans" +
-                    "form.SetParent(parentBone, false);\r\n        modification.inst_armature = armatur" +
-                    "e.gameObject;\r\n      }\r\n      modification.instance = newPart;\r\n\r\n      //TODO: " +
-                    "add a way to load multiple DynamicBone Scripts for a single modification\r\n    \r\n" +
-                    "      ///////////////////////////////////////////////////////////\r\n      /// Add" +
-                    " dynamic bones stuff here\r\n      /// Things like DynamicBones Component, assigni" +
-                    "ng values to dynamic bones component, adding DB_Colliders and editing them, etc." +
-                    "\r\n      if(modification.dynamicBoneData != null)\r\n      {\r\n        ModificationA" +
-                    "pplyDynamicBones(modelObject, modification);\r\n      }\r\n      /// Add dynamic bon" +
-                    "es stuff here\r\n      ///////////////////////////////////////////////////////////" +
-                    "\r\n\r\n      ///////////////////////////////////////////////////////////\r\n      ///" +
-                    " Add renderers to the character\'s renderer list\r\n      ModificationAddRenderers(" +
-                    "newPart, characterModel);\r\n      /// Add renderers to the character\'s renderer l" +
-                    "ist\r\n      ///////////////////////////////////////////////////////////\r\n\r\n      " +
-                    "//Push to applied modifications when done\r\n      modifications.OtherModification" +
-                    "s.Add(modification);\r\n    }\r\n\r\n    static void ModificationApplyBones(GameObject" +
-                    " modelObject, Modification modification, AppliedModifications modifications)\r\n  " +
-                    "  {\r\n      var skinRenderers = DynamicSkinHelpers.GetBaseSkinRenderers(modelObje" +
-                    "ct);\r\n\r\n      var newBones = skinRenderers[0].bones.ToList();//assumption is tha" +
-                    "t we find a skinrenderer here, if not then whoops\r\n\r\n      //var newBoneIndex = " +
-                    "DynamicSkinHelpers.FindBoneIndex2(parentBone, newBones);\r\n      //insert new bon" +
-                    "es into array at end of array\r\n      var modBoneArray = DynamicSkinHelpers.BoneA" +
-                    "rrayBuilder(modification.instance.transform);\r\n      newBones.InsertRange(modifi" +
-                    "cation.boneIndex, modBoneArray);\r\n\r\n      //add index and bonecount to modificat" +
-                    "ion\r\n      //modification.boneIndex = newBoneIndex;\r\n      modification.boneCoun" +
-                    "t = modBoneArray.Length;\r\n\r\n      //assign bones to skin renderers\r\n      foreac" +
-                    "h (var renderer in skinRenderers)\r\n      {\r\n        renderer.bones = newBones.To" +
-                    "Array();\r\n      }\r\n\r\n      modifications.BaseModelModifications.Push(modificatio" +
-                    "n);\r\n    }\r\n\r\n    static void ModificationApplyDynamicBones(GameObject modelObje" +
-                    "ct, Modification modification)\r\n    {\r\n      //=================================" +
-                    "=====\r\n      //Add Dynamic Bone Component\r\n      DynamicBone DB = modification.i" +
-                    "nstance.AddComponent<DynamicBone>();\r\n      modification.inst_dynamicBone = DB;\r" +
-                    "\n\r\n      //======================================\r\n      /// Add DynamicBones Co" +
-                    "lliders to other armature bones (Need to do this before Modifying Dynamic Bones " +
-                    "component as we add them to the DB list during modification)\r\n      List<Dynamic" +
-                    "BoneCollider> bonelist = new List<DynamicBoneCollider>();\r\n\r\n      foreach (var " +
-                    "colliderData in modification.dynamicBoneData.m_Colliders)\r\n      {\r\n        var " +
-                    "parent = Utils.FindChildInTree(modelObject.transform, colliderData.m_parent_name" +
-                    ");\r\n        //var parent = modelObject.transform.Find(ChildHelper.GetPath(bodyna" +
-                    "me, colliderData.m_parent_name));\r\n\r\n        var bonecollider = parent.gameObjec" +
-                    "t.AddComponent<DynamicBoneCollider>();\r\n\r\n        bonecollider.m_Direction = col" +
-                    "liderData.m_Direction;\r\n        bonecollider.m_Center = colliderData.m_Center;\r\n" +
-                    "        bonecollider.m_Bound = colliderData.m_Bound;\r\n        bonecollider.m_Rad" +
-                    "ius = colliderData.m_Radius;\r\n        bonecollider.m_Height = colliderData.m_Hei" +
-                    "ght;\r\n\r\n        bonelist.Add(bonecollider);\r\n      }\r\n\r\n      modification.inst_" +
-                    "DB_colliders = bonelist;\r\n\r\n      //======================================\r\n    " +
-                    "  // Modify DynamicBones Component with data\r\n\r\n      var root = Utils.FindChild" +
-                    "InTree(modification.inst_armature.transform, modification.dynamicBoneData.m_Root" +
-                    ");\r\n\r\n      DB.m_Root = root;\r\n      DB.m_Damping = modification.dynamicBoneData" +
-                    ".m_Damping;\r\n      DB.m_DampingDistrib = modification.dynamicBoneData.m_DampingD" +
-                    "istrib;\r\n      DB.m_Elasticity = modification.dynamicBoneData.m_Elasticity;\r\n   " +
-                    "   DB.m_ElasticityDistrib = modification.dynamicBoneData.m_ElasticityDistrib;\r\n " +
-                    "     DB.m_Stiffness = modification.dynamicBoneData.m_Stiffness;\r\n      DB.m_Stif" +
-                    "fnessDistrib = modification.dynamicBoneData.m_StiffnessDistrib;\r\n      DB.m_Iner" +
-                    "t = modification.dynamicBoneData.m_Inert;\r\n      DB.m_InertDistrib = modificatio" +
-                    "n.dynamicBoneData.m_InertDistrib;\r\n      DB.m_Radius = modification.dynamicBoneD" +
-                    "ata.m_Radius;\r\n      DB.m_RadiusDistrib = modification.dynamicBoneData.m_RadiusD" +
-                    "istrib;\r\n      DB.m_EndLength = modification.dynamicBoneData.m_EndLength;\r\n     " +
-                    " DB.m_EndOffset = modification.dynamicBoneData.m_EndOffset;\r\n      DB.m_Gravity " +
-                    "= modification.dynamicBoneData.m_Gravity;\r\n      DB.m_Force = modification.dynam" +
-                    "icBoneData.m_Force;\r\n\r\n      DB.m_Colliders = bonelist;\r\n      DB.m_Exclusions =" +
-                    " new List<Transform>();\r\n      foreach (var exclude in modification.dynamicBoneD" +
-                    "ata.m_Exclusions)\r\n      {\r\n        //NOTE: Assumption here is that the dynamic " +
-                    "bone root is part of the new armature and we are only excluding bones located in" +
-                    " root\r\n        var transform = Utils.FindChildInTree(root, exclude);\r\n\r\n        " +
-                    "if (transform != null)\r\n          DB.m_Exclusions.Add(transform);\r\n        else\r" +
-                    "\n          Debug.LogWarning(\"Tried to exclude a transform that could not be foun" +
-                    "d\");\r\n      }\r\n\r\n\r\n      DB.m_FreezeAxis = modification.dynamicBoneData.m_Freeze" +
-                    "Axis;\r\n\r\n      //TODO: Read DB and compare it to what\'s made in OG mod cause ski" +
-                    "rt is behaving oddly\r\n    }\r\n\r\n    static void ModificationAddRenderers(GameObje" +
-                    "ct newPart, CharacterModel characterModel)\r\n    {\r\n\r\n      //get renderers\r\n    " +
-                    "  var renderers = newPart.GetComponentsInChildren<SkinnedMeshRenderer>(true);\r\n\r" +
-                    "\n      //resize render array to account for new renderers\r\n      Array.Resize(re" +
-                    "f characterModel.baseRendererInfos, characterModel.baseRendererInfos.Length + re" +
-                    "nderers.Length);\r\n\r\n      //NOTE: Need to save the number of renderers added to " +
-                    "the character render info so we can remove them cleanly. Probably add this to mo" +
-                    "difications\r\n      if (renderers.Length != 0)\r\n      {\r\n        int i = renderer" +
-                    "s.Length;\r\n        foreach (var renderer in renderers)\r\n        {\r\n          //2" +
-                    " to add - 3 in\r\n          //resize array to 5\r\n          //first is added at 5-2" +
-                    " (3) which is position 4\r\n          //second is added at 5-1 (4) which is positi" +
-                    "on 5\r\n          //exits\r\n\r\n          characterModel.baseRendererInfos[characterM" +
-                    "odel.baseRendererInfos.Length - i] = new CharacterModel.RendererInfo\r\n          " +
-                    "{\r\n            renderer = renderers[renderers.Length - i],\r\n            ignoreOv" +
-                    "erlays = false,\r\n            defaultShadowCastingMode = UnityEngine.Rendering.Sh" +
-                    "adowCastingMode.On,\r\n            defaultMaterial = renderer.sharedMaterial\r\n    " +
-                    "      };\r\n\r\n          i--; //decrement i to reach the next renederer\r\n        }\r" +
-                    "\n      }\r\n    }\r\n\r\n    private static void clearModification(Modification modifi" +
-                    "cation, GameObject modelObject, AppliedModifications modifications)\r\n    {\r\n    " +
-                    "  //Destroy Dynamic Bones colliders\r\n      if(modification.inst_DB_colliders != " +
-                    "null)\r\n      {     \r\n        foreach (var collider in modification.inst_DB_colli" +
-                    "ders)\r\n        {\r\n          Destroy(collider);\r\n        }\r\n      }\r\n\r\n      //Re" +
-                    "move Additions to Bone Arrays\r\n      if (modification.affectsbasemodel)\r\n      {" +
-                    "\r\n        var renderers = DynamicSkinHelpers.GetBaseSkinRenderers(modelObject);\r" +
-                    "\n        var oldBones = renderers[0].bones.ToList();\r\n\r\n        oldBones.RemoveR" +
-                    "ange(modification.boneIndex, modification.boneCount);\r\n\r\n        foreach (var re" +
-                    "nderer in renderers)\r\n        {\r\n          renderer.bones = oldBones.ToArray();\r" +
-                    "\n        }\r\n      }\r\n\r\n      //Destroy Dynamic Bones Component (Probably don\'t h" +
-                    "ave to do this since it will be destroyed along with PrefabInstance if parented " +
-                    "to it)\r\n      Destroy(modifications.OtherModifications[0].inst_dynamicBone);\r\n  " +
-                    "    //Destroy Armature\r\n      Destroy(modifications.OtherModifications[0].inst_a" +
-                    "rmature);\r\n      //Destroy Prefab Instance\r\n      Destroy(modifications.OtherMod" +
-                    "ifications[0].instance);\r\n\r\n      bool removed = modifications.OtherModification" +
-                    "s.Remove(modification);\r\n      if (!removed) InstanceLogger.LogError(\"Skin Modif" +
-                    "ication was not removed\");\r\n    }\r\n\r\n    ////// Local Functions\r\n    ///////////" +
-                    "/////////////////////////////////////////////////////////////////\r\n\r\n    ///////" +
-                    "/////////////////////////////////////////////////////////////////////\r\n    /////" +
-                    "/ Local Classes\r\n    class Modification\r\n    {\r\n\r\n      public Modification(stri" +
-                    "ng PrefabPath, string ParentName, string BodyName, string ParentSkinToken, int B" +
-                    "oneIndex, bool AffectsBaseModel, AssetBundle assetBundle)\r\n      {\r\n        body" +
-                    "name = BodyName;\r\n        prefabpath = PrefabPath;\r\n        parentname = ParentN" +
-                    "ame;\r\n        parentSkinToken = ParentSkinToken;\r\n        affectsbasemodel = Aff" +
-                    "ectsBaseModel;\r\n        boneIndex = BoneIndex;\r\n        prefab = assetBundle.Loa" +
-                    "dAsset<GameObject>(@prefabpath);\r\n        if (prefab == null) { Debug.LogWarning" +
-                    "(\"Asset at \" + PrefabPath + \" was not loaded\"); } //DEBUG check for if asset was" +
-                    " not loaded\r\n      }\r\n\r\n      //////////////////////////////////////////////////" +
-                    "////\r\n      /// These are created when the Modification is created\r\n      public" +
-                    " string prefabpath;\r\n      public string bodyname; //Name of the base BodyName. " +
-                    "i.e. MercBody or MageBody\r\n      public string parentname; //the name of the bon" +
-                    "e we want to parent this modification to\r\n      public GameObject prefab;\r\n     " +
-                    " public bool affectsbasemodel; //if the modification affects the base model then" +
-                    " we need to do additional steps\r\n      //TODO: Add Support for multiple Dynamic " +
-                    "Bone Scripts per modification\r\n      public DynamicBoneData dynamicBoneData;\r\n  " +
-                    "    public string parentSkinToken;\r\n      /// \r\n      //////////////////////////" +
-                    "////////////////////////////\r\n\r\n      //////////////////////////////////////////" +
-                    "////////////\r\n      /// Used for bones that need to be added to base model\r\n    " +
-                    "  public int boneIndex; //index of bone in bone array, created on modification\r\n" +
-                    "      public int boneCount; //number of bones in prefab bone armature\r\n         " +
-                    "                   ///\r\n      //////////////////////////////////////////////////" +
-                    "////\r\n\r\n      //////////////////////////////////////////////////////\r\n      /// " +
-                    "These objects are instanceated and destroyed on skinDefApply\r\n      public GameO" +
-                    "bject instance; //The created instance of the prefab attatched to the character\r" +
-                    "\n      public GameObject inst_armature; //the armature of the created instance\r\n" +
-                    "    \r\n    //TODO: add support for multiple DynamicBone Scripts per modification\r" +
-                    "\n      public DynamicBone inst_dynamicBone; //the dynamic bone attatched to the " +
-                    "instance\r\n      public List<DynamicBoneCollider> inst_DB_colliders = new List<Dy" +
-                    "namicBoneCollider>(); //List of Dynamic Bone Colliders that were attatched to ot" +
-                    "her bones for this modification\r\n                                               " +
-                    "                                          ///\r\n      ///////////////////////////" +
-                    "///////////////////////////\r\n\r\n      //This only contained the Skinned Mesh Rend" +
-                    "erers and I think I can do these inline instead\r\n      // //////////////////////" +
-                    "////////////////////////////////\r\n      // /// These don\'t seem to be created or" +
-                    " destroyed and are just assigned to\r\n      // \r\n      // //Note: it looks like a" +
-                    "ll the mesh renderers are using the same bone list as the base code only ever lo" +
-                    "oked at the one and assigned to both\r\n      // //these were taken from the meshe" +
-                    "s at root of the model\r\n      // SkinnedMeshRenderer[] meshRenderers;\r\n      // " +
-                    "\r\n      // /// These don\'t seem to be created or destroyed and are just assigned" +
-                    " to\r\n      // //////////////////////////////////////////////////////\r\n    }\r\n\r\n " +
-                    "   class AppliedModifications\r\n    {\r\n      public Stack<Modification> BaseModel" +
-                    "Modifications = new Stack<Modification>();\r\n      public List<Modification> Othe" +
-                    "rModifications = new List<Modification>();//storage for modifications\r\n    }\r\n\r\n" +
-                    "\r\n    //Data classes include strings in place of transforms as we need to search" +
-                    " for the transforms when we load the data in\r\n    class DynamicBoneData\r\n    {\r\n" +
-                    "      public DynamicBoneData(string root,\r\n                     float damping, A" +
-                    "nimationCurve damping_dist,\r\n                     float elasticity, AnimationCur" +
-                    "ve elasticity_dist,\r\n                     float stiffness, AnimationCurve stiffn" +
-                    "ess_dist,\r\n                     float inert, AnimationCurve inert_dist,\r\n       " +
-                    "              //float friction, AnimationCurve friction_dist, //NOTE: looks like" +
-                    " ROR2 is using an older version of DynBone that doesn\'t have friction\r\n         " +
-                    "            float radius, AnimationCurve radius_dist,\r\n                     floa" +
-                    "t end_length, Vector3 end_offset,\r\n                     Vector3 gravity, Vector3" +
-                    " force,\r\n                     List<DynamicBoneColliderData> colliders,\r\n        " +
-                    "             List<string> exclusions,\r\n                     DynamicBone.FreezeAx" +
-                    "is freeze_axis)\r\n      {\r\n        m_Root = root;\r\n        m_Damping = damping;\r\n" +
-                    "        m_DampingDistrib = damping_dist;\r\n        m_Elasticity = elasticity;\r\n  " +
-                    "      m_ElasticityDistrib = elasticity_dist;\r\n        m_Stiffness = stiffness;\r\n" +
-                    "        m_StiffnessDistrib = stiffness_dist;\r\n        m_Inert = inert;\r\n        " +
-                    "m_InertDistrib = inert_dist;\r\n        //new_DB.m_Friction = friction;\r\n        /" +
-                    "/new_DB.m_FrictionDistrib = friction_dist;\r\n        m_Radius = radius;\r\n        " +
-                    "m_RadiusDistrib = radius_dist;\r\n        m_EndLength = end_length;\r\n        m_End" +
-                    "Offset = end_offset;\r\n        m_Gravity = gravity;\r\n        m_Force = force;\r\n  " +
-                    "      m_Colliders = colliders;\r\n        m_Exclusions = exclusions;\r\n        m_Fr" +
-                    "eezeAxis = freeze_axis;\r\n      }\r\n    \r\n      //would include string for parent_" +
-                    "name but all dynamicbones should be created on modification_instance\r\n\r\n      pu" +
-                    "blic string m_Root;\r\n      public float m_Damping;\r\n      public AnimationCurve " +
-                    "m_DampingDistrib;\r\n      public float m_Elasticity;\r\n      public AnimationCurve" +
-                    " m_ElasticityDistrib;\r\n      public float m_Stiffness;\r\n      public AnimationCu" +
-                    "rve m_StiffnessDistrib;\r\n      public float m_Inert;\r\n      public AnimationCurv" +
-                    "e m_InertDistrib;\r\n      //public float friction; public AnimationCurve friction" +
-                    "_dist; //NOTE: looks like ROR2 is using an older version of DynBone that doesn\'t" +
-                    " have friction\r\n      public float m_Radius;\r\n      public AnimationCurve m_Radi" +
-                    "usDistrib;\r\n      public float m_EndLength;\r\n      public Vector3 m_EndOffset;\r\n" +
-                    "      public Vector3 m_Gravity;\r\n      public Vector3 m_Force;\r\n      public Lis" +
-                    "t<DynamicBoneColliderData> m_Colliders;\r\n      public List<string> m_Exclusions;" +
-                    "\r\n      public DynamicBone.FreezeAxis m_FreezeAxis;\r\n    }\r\n\r\n    class DynamicB" +
-                    "oneColliderData\r\n    {\r\n      public DynamicBoneColliderData(string parent_name," +
-                    " DynamicBoneCollider.Direction direction, Vector3 Center, DynamicBoneCollider.Bo" +
-                    "und bound, float radius, float heaight)\r\n      {\r\n        m_parent_name = parent" +
-                    "_name;\r\n        m_Direction = direction;\r\n        m_Center = Center;\r\n        m_" +
-                    "Bound = bound;\r\n        m_Radius = radius;\r\n        m_Height = heaight;\r\n      }" +
-                    "\r\n\r\n      public string m_parent_name;\r\n      public DynamicBoneCollider.Directi" +
-                    "on m_Direction;\r\n      public Vector3 m_Center;\r\n      public DynamicBoneCollide" +
-                    "r.Bound m_Bound;\r\n      public float m_Radius;\r\n      public float m_Height;\r\n\r\n" +
-                    "    }\r\n\r\n    ////// Local Classes\r\n    /////////////////////////////////////////" +
-                    "///////////////////////////////////\r\n  }\r\n}");
+            this.Write("    }\r\n\r\n    static void onSkinAdded(object sender, SkinAddedArgs e)\r\n    {\r\n    " +
+                    "  dynamicSkin.AddSkinDef(e.skinDef);\r\n    }\r\n  }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
-    
-    #line default
-    #line hidden
     #region Base class
     /// <summary>
     /// Base class for this transformation

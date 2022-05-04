@@ -1,14 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
-using System;
 using System.IO;
-using DynamicSkinBuilder;
+using RuneFoxMods.DynamicSkinBuilder;
 
 namespace DynamicSkinBuilder.CustomEditors
 {
-
 
   [CustomEditor(typeof(DynamicSkinInfo))]
   public class DynamicSkinInfoEditor : Editor

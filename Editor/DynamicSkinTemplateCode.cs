@@ -1,9 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using RoRSkinBuilder.Data;
-using RoRSkinBuilder;
-
-namespace DynamicSkinBuilder
+﻿namespace RuneFoxMods.DynamicSkinBuilder
 {
   public partial class DynamicSkinTemplate
   {
