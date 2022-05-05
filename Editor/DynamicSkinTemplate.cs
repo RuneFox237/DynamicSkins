@@ -45,29 +45,35 @@ namespace RuneFoxMods.DynamicSkinBuilder
             this.Write(@"    ///
     ///////////////////////////////////////////////////////////
     
-    void DynamicSkinBeforeStart()
+    partial void BeforeStart()
     {
       dynamicSkin.InstanceLogger = Instance.Logger;
       new Hook(typeof(SkinDef).GetMethod(nameof(SkinDef.Apply)), (Action<Action<SkinDef, GameObject>, SkinDef, GameObject>) dynamicSkin.SkinDefApply).Apply();
     }
 
-    void DynamicSkinAfterStart()
+    partial void AfterStart()
     {
       InitializeModifications();
       InitializeDynamicBones();
       AddModificationsToList();
     }
 
-    static void DynamicSkinBeforeBodyCatalogInit()
+    static partial  void BeforeBodyCatalogInit()
     {
+    }
+   
+    static partial void AfterBodyCatalogInit(){}
+
+    //Name for this is generated from the skinDef generator
 ");
-  foreach(var skin in info.dynamicSkins) { 
-            this.Write("      ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.bodyName + skin.skinDef.name));
-            this.Write("SkinAddedEvent += onSkinAdded;\r\n");
-}
-            this.Write("    }\r\n\r\n    static void DynamicSkinAfterBodyCatalogInit(){}\r\n    \r\n    void Init" +
-                    "ializeModifications()\r\n    {\r\n");
+ foreach(var skin in info.dynamicSkins) { 
+            this.Write("    static partial void ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.bodyName.ToUpperCamelCase()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name.ToUpperCamelCase()));
+            this.Write("SkinAdded (SkinDef skinDef, GameObject bodyPrefab)\r\n    {\r\n      dynamicSkin.Skin" +
+                    "Defs.Add(skinDef.nameToken, skinDef);\r\n    }\r\n");
+ } 
+            this.Write("    \r\n    void InitializeModifications()\r\n    {\r\n");
   foreach(var skin in info.dynamicSkins) {
     foreach(var mod in skin.modifications) {
     var rend = DynamicSkinHelpers.GetTopParent(mod.parentBone.transform).GetComponentInChildren<SkinnedMeshRenderer>();
@@ -117,8 +123,7 @@ namespace RuneFoxMods.DynamicSkinBuilder
  } 
             this.Write("    \r\n");
  } 
-            this.Write("    }\r\n\r\n    static void onSkinAdded(object sender, SkinAddedArgs e)\r\n    {\r\n    " +
-                    "  dynamicSkin.AddSkinDef(e.skinDef);\r\n    }\r\n  }\r\n}");
+            this.Write("    }\r\n\r\n  }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
