@@ -6,7 +6,8 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "RoR2-nstrip.dll"
+        "RoR2-nstrip.dll",
+        "BepInEx.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
