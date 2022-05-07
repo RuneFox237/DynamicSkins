@@ -11,7 +11,7 @@ namespace RuneFoxMods.DynamicSkinBuilder
 {
     using RoRSkinBuilder.Data;
     using RoRSkinBuilder;
-    using DynamicSkinBuilder;
+    using DynamicSkins;
     using UnityEngine;
     using System;
     
@@ -32,9 +32,9 @@ namespace RuneFoxMods.DynamicSkinBuilder
             this.Write(this.ToStringHelper.ToStringWithCulture(info.assetInfo.uccModName));
             this.Write("\r\n{\r\n  public partial class ");
             this.Write(this.ToStringHelper.ToStringWithCulture(info.assetInfo.uccModName));
-            this.Write("Plugin \r\n  { \r\n    static DynamicSkin dynamicSkin = new DynamicSkin();\r\n\r\n    ///" +
-                    "////////////////////////////////////////////////////////\r\n    /// Add Decleratio" +
-                    "ns of all Modifications here\r\n");
+            this.Write("Plugin \r\n  { \r\n    static DynamicSkinExtension dynamicSkin = new DynamicSkinExten" +
+                    "sion();\r\n\r\n    ///////////////////////////////////////////////////////////\r\n    " +
+                    "/// Add Declerations of all Modifications here\r\n");
   foreach(var skin in info.dynamicSkins) { 
     foreach(var mod in skin.modifications) {
             this.Write("    Modification ");
@@ -58,12 +58,12 @@ namespace RuneFoxMods.DynamicSkinBuilder
       AddModificationsToList();
     }
 
-    static partial  void BeforeBodyCatalogInit()
+    static partial void BeforeBodyCatalogInit()
     {
     }
-   
-    static partial void AfterBodyCatalogInit(){}
 
+    static partial void AfterBodyCatalogInit(){}
+    
     //Name for this is generated from the skinDef generator
 ");
  foreach(var skin in info.dynamicSkins) { 
@@ -73,10 +73,11 @@ namespace RuneFoxMods.DynamicSkinBuilder
             this.Write("SkinAdded (SkinDef skinDef, GameObject bodyPrefab)\r\n    {\r\n      dynamicSkin.Skin" +
                     "Defs.Add(skinDef.nameToken, skinDef);\r\n    }\r\n");
  } 
-            this.Write("    \r\n    void InitializeModifications()\r\n    {\r\n");
+            this.Write("\r\n    void InitializeModifications()\r\n    {\r\n");
   foreach(var skin in info.dynamicSkins) {
+    int externalIndexer = -1;
+    var rend = info.GetMainRenderer(skin);
     foreach(var mod in skin.modifications) {
-    var rend = DynamicSkinHelpers.GetTopParent(mod.parentBone.transform).GetComponentInChildren<SkinnedMeshRenderer>();
       //ModificationName = new Modification("PrefabName.prefab", "ParentName", "BodyName", "SkinNameToken" false, assetBundle);
 
             this.Write("      ");
@@ -90,7 +91,7 @@ namespace RuneFoxMods.DynamicSkinBuilder
             this.Write("\", \"");
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.CreateNameToken(info.modInfo.author)));
             this.Write("\", ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(mod.affectsBaseModel?DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend):externalIndexer--));
             this.Write(", ");
             this.Write(this.ToStringHelper.ToStringWithCulture(mod.affectsBaseModel?"true":"false"));
             this.Write(", assetBundle);\r\n");
@@ -110,20 +111,22 @@ namespace RuneFoxMods.DynamicSkinBuilder
 }
             this.Write("    }\r\n\r\n    void AddModificationsToList()\r\n    {\r\n");
   foreach(var skin in info.dynamicSkins) { 
+      var rend = info.GetMainRenderer(skin);
+      int externalIndexer = -1;
       for(int i = 0; i< skin.modifications.Count; i++) {
-      var mod = skin.modifications[i];
-      var rend = DynamicSkinHelpers.GetTopParent(mod.parentBone.transform).GetComponentInChildren<SkinnedMeshRenderer>(); 
+      var mod = skin.modifications[i]; 
             this.Write("      dynamicSkin.AddModification(\"");
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.CreateNameToken(info.modInfo.author)));
             this.Write("\", ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(mod.affectsBaseModel?DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend):externalIndexer--));
             this.Write(", ");
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
             this.Write("Modification);\r\n");
  } 
             this.Write("    \r\n");
  } 
-            this.Write("    }\r\n\r\n  }\r\n}");
+            this.Write("    }\r\n\r\n    //static void onSkinAdded(object sender, SkinAddedArgs e)\r\n    //{\r\n" +
+                    "    //  dynamicSkin.AddSkinDef(e.skinDef);\r\n    //}\r\n  }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
