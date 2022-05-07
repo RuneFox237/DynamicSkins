@@ -1,7 +1,7 @@
 ﻿<#@ template language="C#" linePragmas="false" #>
 <#@ import namespace="RoRSkinBuilder.Data" #>
 <#@ import namespace="RoRSkinBuilder" #>
-<#@ import namespace="DynamicSkinBuilder" #>
+<#@ import namespace="DynamicSkins" #>
 <#@ import namespace="UnityEngine" #>
 using RoR2;
 using System;
@@ -16,7 +16,7 @@ namespace <#= info.assetInfo.uccModName #>
 {
   public partial class <#= info.assetInfo.uccModName #>Plugin 
   { 
-    static DynamicSkin dynamicSkin = new DynamicSkin();
+    static DynamicSkinExtension dynamicSkin = new DynamicSkinExtension();
 
     ///////////////////////////////////////////////////////////
     /// Add Declerations of all Modifications here
@@ -53,11 +53,12 @@ namespace <#= info.assetInfo.uccModName #>
     void InitializeModifications()
     {
 <#  foreach(var skin in info.dynamicSkins) {
+    int externalIndexer = -1;
+    var rend = info.GetMainRenderer(skin);
     foreach(var mod in skin.modifications) {
-    var rend = DynamicSkinHelpers.GetTopParent(mod.parentBone.transform).GetComponentInChildren<SkinnedMeshRenderer>();
       //ModificationName = new Modification("PrefabName.prefab", "ParentName", "BodyName", "SkinNameToken" false, assetBundle);
 #>
-      <#= skin.skinDef.name + mod.prefab.name #>Modification = new Modification("<#= mod.prefab.name #>.prefab", "<#= mod.parentBone.name #>", "<#= skin.skinDef.bodyName #>", "<#=skin.skinDef.CreateNameToken(info.modInfo.author)#>", <#=DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend)#>, <#= mod.affectsBaseModel?"true":"false"  #>, assetBundle);
+      <#= skin.skinDef.name + mod.prefab.name #>Modification = new Modification("<#= mod.prefab.name #>.prefab", "<#= mod.parentBone.name #>", "<#= skin.skinDef.bodyName #>", "<#=skin.skinDef.CreateNameToken(info.modInfo.author)#>", <#=mod.affectsBaseModel?DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend):externalIndexer--#>, <#= mod.affectsBaseModel?"true":"false"  #>, assetBundle);
 <#   }
   } #>
     }
@@ -76,10 +77,11 @@ namespace <#= info.assetInfo.uccModName #>
     void AddModificationsToList()
     {
 <#  foreach(var skin in info.dynamicSkins) { 
+      var rend = info.GetMainRenderer(skin);
+      int externalIndexer = -1;
       for(int i = 0; i< skin.modifications.Count; i++) {
-      var mod = skin.modifications[i];
-      var rend = DynamicSkinHelpers.GetTopParent(mod.parentBone.transform).GetComponentInChildren<SkinnedMeshRenderer>(); #>
-      dynamicSkin.AddModification("<#= skin.skinDef.CreateNameToken(info.modInfo.author) #>", <#=DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend)#>, <#= skin.skinDef.name + mod.prefab.name #>Modification);
+      var mod = skin.modifications[i]; #>
+      dynamicSkin.AddModification("<#= skin.skinDef.CreateNameToken(info.modInfo.author) #>", <#=mod.affectsBaseModel?DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend):externalIndexer--#>, <#= skin.skinDef.name + mod.prefab.name #>Modification);
 <# } #>
     
 <# } #>

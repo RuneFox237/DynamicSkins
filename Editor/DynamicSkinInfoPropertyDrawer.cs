@@ -30,11 +30,11 @@ namespace DynamicSkinBuilder.CustomEditors
       File.WriteAllText(path, DynamicSkinCode.TransformText());
 
       //turns out that this still works the same even if the package is in the package cache
-      File.Copy("Packages/com.runefox237.dynamicskinbuilder/Editor/CopyPath/DynamicSkinHelpers.cs", dynamicSkinInfo.assetInfo.modFolder + "/DynamicSkinHelpers.cs", true);
+      File.Copy("Packages/com.runefox237.dynamicskinbuilder/Editor/CopyPath/DynamicSkins.cs", dynamicSkinInfo.assetInfo.modFolder + "/DynamicSkins.cs", true);
       File.Copy("Packages/com.runefox237.dynamicskinbuilder/Editor/CopyPath/RuneFox_Utils.cs", dynamicSkinInfo.assetInfo.modFolder + "/RuneFox_Utils.cs", true);
 
       AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
-      AssetDatabase.ImportAsset(dynamicSkinInfo.assetInfo.modFolder + "/DynamicSkinHelpers.cs", ImportAssetOptions.ForceUpdate);
+      AssetDatabase.ImportAsset(dynamicSkinInfo.assetInfo.modFolder + "/DynamicSkins.cs", ImportAssetOptions.ForceUpdate);
       AssetDatabase.ImportAsset(dynamicSkinInfo.assetInfo.modFolder + "/RuneFox_Utils.cs", ImportAssetOptions.ForceUpdate);
 
 

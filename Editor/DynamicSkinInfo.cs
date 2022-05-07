@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using RoRSkinBuilder.Data;
+using RuneFoxMods.DynamicSkins;
 
 namespace RuneFoxMods.DynamicSkinBuilder
 {
@@ -14,16 +16,14 @@ namespace RuneFoxMods.DynamicSkinBuilder
   
     [SerializeField]
     public List<DynamicSkin> dynamicSkins = new List<DynamicSkin>();
-  
+
     [Serializable]
     public class DynamicSkin
     {
       public SkinDefinition skinDef;
       public List<DynamicModification> modifications;
-  
     }
-  
-  
+
     [Serializable]
     public class DynamicModification
     {
@@ -32,7 +32,7 @@ namespace RuneFoxMods.DynamicSkinBuilder
       public GameObject parentBone;
       public bool affectsBaseModel = true;
     }
-  
+
     public DynamicSkinInfo(SkinModInfo modinfo_)
     {
       modInfo = modinfo_;
@@ -50,6 +50,40 @@ namespace RuneFoxMods.DynamicSkinBuilder
     {
       assetInfo = new AssetsInfo(modInfo);
     }
-  
+
+    internal SkinnedMeshRenderer GetMainRenderer(DynamicSkin skin)
+    {
+      //All parentBones should lead to the same TopParent so we grab first one.
+      var renderers = DynamicSkinHelpers.GetTopParent(skin.modifications[0].parentBone.transform).GetComponentsInChildren<SkinnedMeshRenderer>();
+
+      List<SkinnedMeshRenderer> MainRends = new List<SkinnedMeshRenderer>();
+      foreach (var rend in renderers)
+      {
+        bool rendHasAll = true;
+        foreach (var mod in skin.modifications)
+        {
+          if (rend.bones.Contains(mod.parentBone.transform) == false)
+          {
+            rendHasAll = false;
+            break;
+          }
+        }
+
+        if (rendHasAll)
+          MainRends.Add(rend);
+      }
+
+      if (MainRends.Count == 0)
+      {
+        Debug.LogError("Could Not find a renderer that contained the parent bones of all modifications");
+        return null;
+      }
+      if (MainRends.Count > 1)
+      {
+        //Debug.Log("Found more than one renderer that matched the criteria for Main Renderer of " + skin.skinDef.name + ", using the first one found");
+      }
+      return MainRends[0];
+    }
+
   }
 }

@@ -99,6 +99,7 @@ namespace RuneFoxMods.DynamicSkins
     public static int GetBoneIndexInList(Transform targetBone, SkinnedMeshRenderer meshRenderer)
     {
       var bonearray = meshRenderer.bones;
+      //Debug.Log(meshRenderer.name);
       for (int i = 0; i <= bonearray.Length; i++)
       {
         //Debug.Log(targetBone.name + "   " + bonearray[i + 1].name);
@@ -123,8 +124,7 @@ namespace RuneFoxMods.DynamicSkins
     ////////////////////////////////////////////////////////////////////////////
   }
 
-
-  class DynamicSkin
+  class DynamicSkinExtension
   {
     ///////////////////////////////////////////////////////////
     /// Local Declarations
@@ -142,6 +142,18 @@ namespace RuneFoxMods.DynamicSkins
 
     ////////////////////////////////////////////////////////////////////////////
     ////// Dynamic Skin Functions
+    internal void AddModification(string skinNameToken, int boneIndex, Modification modification)
+    {
+      SortedList<int, Modification> modList;
+      if (ModificationList.TryGetValue(skinNameToken, out modList) == false)
+      {
+        modList = new SortedList<int, Modification>();
+        ModificationList.Add(skinNameToken, modList);
+      }
+
+      modList.Add(boneIndex, modification);
+    }
+
     internal void AddSkinDef(SkinDef skinDef)
     {
       SkinDefs.Add(skinDef.nameToken, skinDef);

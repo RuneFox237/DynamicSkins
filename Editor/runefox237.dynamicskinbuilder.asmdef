@@ -7,8 +7,10 @@
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "DynamicBones.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [
         "UNITY_EDITOR"
