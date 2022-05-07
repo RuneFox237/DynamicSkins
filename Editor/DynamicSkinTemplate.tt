@@ -28,28 +28,33 @@ namespace <#= info.assetInfo.uccModName #>
     ///
     ///////////////////////////////////////////////////////////
     
-    void DynamicSkinBeforeStart()
+    partial void BeforeStart()
     {
       dynamicSkin.InstanceLogger = Instance.Logger;
       new Hook(typeof(SkinDef).GetMethod(nameof(SkinDef.Apply)), (Action<Action<SkinDef, GameObject>, SkinDef, GameObject>) dynamicSkin.SkinDefApply).Apply();
     }
 
-    void DynamicSkinAfterStart()
+    partial void AfterStart()
     {
       InitializeModifications();
       InitializeDynamicBones();
       AddModificationsToList();
     }
 
-    static void DynamicSkinBeforeBodyCatalogInit()
+    static partial void BeforeBodyCatalogInit()
     {
-<#  foreach(var skin in info.dynamicSkins) { #>
-      <#= skin.skinDef.bodyName + skin.skinDef.name #>SkinAddedEvent += onSkinAdded;
-<#}#>
     }
 
-    static void DynamicSkinAfterBodyCatalogInit(){}
+    static partial void AfterBodyCatalogInit(){}
     
+    //Name for this is generated from the skinDef generator
+<# foreach(var skin in info.dynamicSkins) { #>
+    static partial void <#= skin.skinDef.bodyName.ToUpperCamelCase() #><#= skin.skinDef.name.ToUpperCamelCase()#>SkinAdded (SkinDef skinDef, GameObject bodyPrefab)
+    {
+      dynamicSkin.SkinDefs.Add(skinDef.nameToken, skinDef);
+    }
+<# } #>
+
     void InitializeModifications()
     {
 <#  foreach(var skin in info.dynamicSkins) {
@@ -87,9 +92,9 @@ namespace <#= info.assetInfo.uccModName #>
 <# } #>
     }
 
-    static void onSkinAdded(object sender, SkinAddedArgs e)
-    {
-      dynamicSkin.AddSkinDef(e.skinDef);
-    }
+    //static void onSkinAdded(object sender, SkinAddedArgs e)
+    //{
+    //  dynamicSkin.AddSkinDef(e.skinDef);
+    //}
   }
 }
