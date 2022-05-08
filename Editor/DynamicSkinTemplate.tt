@@ -16,80 +16,84 @@ namespace <#= info.assetInfo.uccModName #>
 {
   public partial class <#= info.assetInfo.uccModName #>Plugin 
   { 
-    static DynamicSkinExtension dynamicSkin = new DynamicSkinExtension();
+    static <#=info.Name#>Extension _<#=info.Name#>Extension = new <#=info.Name#>Extension();
+    static DynamicSkinManager _DynamicSkinManager = new DynamicSkinManager();
 
-    ///////////////////////////////////////////////////////////
-    /// Add Declerations of all Modifications here
+    public class <#=info.Name#>Extension
+    {
+      ///////////////////////////////////////////////////////////
+      /// Add Declerations of all Modifications here
 <#  foreach(var skin in info.dynamicSkins) { 
     foreach(var mod in skin.modifications) {#>
-    Modification <#= skin.skinDef.name + mod.prefab.name #>Modification;
+      Modification <#= skin.skinDef.name + mod.prefab.name #>Modification;
 <#    } 
    } #>
-    ///
-    ///////////////////////////////////////////////////////////
-    
-    void DynamicSkinBeforeStart()
-    {
-      dynamicSkin.InstanceLogger = Instance.Logger;
-      new Hook(typeof(SkinDef).GetMethod(nameof(SkinDef.Apply)), (Action<Action<SkinDef, GameObject>, SkinDef, GameObject>) dynamicSkin.SkinDefApply).Apply();
-    }
+      ///
+      ///////////////////////////////////////////////////////////
+      
+      internal void BeforeStart()
+      {
+        _DynamicSkinManager.InstanceLogger = Instance.Logger;
+        new Hook(typeof(SkinDef).GetMethod(nameof(SkinDef.Apply)), (Action<Action<SkinDef, GameObject>, SkinDef, GameObject>) _DynamicSkinManager.SkinDefApply).Apply();
+      }
 
-    void DynamicSkinAfterStart()
-    {
-      InitializeModifications();
-      InitializeDynamicBones();
-      AddModificationsToList();
-    }
+      internal void AfterStart()
+      {
+        InitializeModifications();
+        InitializeDynamicBones();
+        AddModificationsToList();
+      }
 
-    static void DynamicSkinBeforeBodyCatalogInit()
-    {
+      internal void BeforeBodyCatalogInit()
+      {
 <#  foreach(var skin in info.dynamicSkins) { #>
-      <#= skin.skinDef.bodyName + skin.skinDef.name #>SkinAddedEvent += onSkinAdded;
+        <#= skin.skinDef.bodyName + skin.skinDef.name #>SkinAddedEvent += onSkinAdded;
 <#}#>
-    }
+      }
 
-    static void DynamicSkinAfterBodyCatalogInit(){}
-    
-    void InitializeModifications()
-    {
+      internal void AfterBodyCatalogInit(){}
+      
+      void InitializeModifications()
+      {
 <#  foreach(var skin in info.dynamicSkins) {
     int externalIndexer = -1;
     var rend = info.GetMainRenderer(skin);
     foreach(var mod in skin.modifications) {
       //ModificationName = new Modification("PrefabName.prefab", "ParentName", "BodyName", "SkinNameToken" false, assetBundle);
 #>
-      <#= skin.skinDef.name + mod.prefab.name #>Modification = new Modification("<#= mod.prefab.name #>.prefab", "<#= mod.parentBone.name #>", "<#= skin.skinDef.bodyName #>", "<#=skin.skinDef.CreateNameToken(info.modInfo.author)#>", <#=mod.affectsBaseModel?DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend):externalIndexer--#>, <#= mod.affectsBaseModel?"true":"false"  #>, assetBundle);
+        <#= skin.skinDef.name + mod.prefab.name #>Modification = new Modification("<#= mod.prefab.name #>.prefab", "<#= mod.parentBone.name #>", "<#= skin.skinDef.bodyName #>", "<#=skin.skinDef.CreateNameToken(info.modInfo.author)#>", <#=mod.affectsBaseModel?DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend):externalIndexer--#>, <#= mod.affectsBaseModel?"true":"false"  #>, assetBundle);
 <#   }
   } #>
-    }
+      }
 
-    void InitializeDynamicBones()
-    {
+      void InitializeDynamicBones()
+      {
 <#  foreach(var skin in info.dynamicSkins) { 
     foreach(var mod in skin.modifications) {
     //ModificationName.dynamicBoneData = null; //get from DB reader
 #>
-      <#= skin.skinDef.name + mod.prefab.name #>Modification.dynamicBoneData = <#= DynamicBoneReader.CreateConstructor(mod.dynamicBone) #>
+        <#= skin.skinDef.name + mod.prefab.name #>Modification.dynamicBoneData = <#= DynamicBoneReader.CreateConstructor(mod.dynamicBone) #>
 <# }
 }#>
-    }
+      }
 
-    void AddModificationsToList()
-    {
+      void AddModificationsToList()
+      {
 <#  foreach(var skin in info.dynamicSkins) { 
       var rend = info.GetMainRenderer(skin);
       int externalIndexer = -1;
       for(int i = 0; i< skin.modifications.Count; i++) {
       var mod = skin.modifications[i]; #>
-      dynamicSkin.AddModification("<#= skin.skinDef.CreateNameToken(info.modInfo.author) #>", <#=mod.affectsBaseModel?DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend):externalIndexer--#>, <#= skin.skinDef.name + mod.prefab.name #>Modification);
+        _DynamicSkinManager.AddModification("<#= skin.skinDef.CreateNameToken(info.modInfo.author) #>", <#=mod.affectsBaseModel?DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend):externalIndexer--#>, <#= skin.skinDef.name + mod.prefab.name #>Modification);
 <# } #>
     
 <# } #>
-    }
+      }
 
-    static void onSkinAdded(object sender, SkinAddedArgs e)
-    {
-      dynamicSkin.AddSkinDef(e.skinDef);
+      static void onSkinAdded(object sender, SkinAddedArgs e)
+      {
+        _DynamicSkinManager.AddSkinDef(e.skinDef);
+      }
     }
   }
 }

@@ -32,49 +32,57 @@ namespace RuneFoxMods.DynamicSkinBuilder
             this.Write(this.ToStringHelper.ToStringWithCulture(info.assetInfo.uccModName));
             this.Write("\r\n{\r\n  public partial class ");
             this.Write(this.ToStringHelper.ToStringWithCulture(info.assetInfo.uccModName));
-            this.Write("Plugin \r\n  { \r\n    static DynamicSkinExtension dynamicSkin = new DynamicSkinExten" +
-                    "sion();\r\n\r\n    ///////////////////////////////////////////////////////////\r\n    " +
-                    "/// Add Declerations of all Modifications here\r\n");
+            this.Write("Plugin \r\n  { \r\n    static ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(info.Name));
+            this.Write("Extension _");
+            this.Write(this.ToStringHelper.ToStringWithCulture(info.Name));
+            this.Write("Extension = new ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(info.Name));
+            this.Write("Extension();\r\n    static DynamicSkinManager _DynamicSkinManager = new DynamicSkin" +
+                    "Manager();\r\n\r\n    public class ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(info.Name));
+            this.Write("Extension\r\n    {\r\n      /////////////////////////////////////////////////////////" +
+                    "//\r\n      /// Add Declerations of all Modifications here\r\n");
   foreach(var skin in info.dynamicSkins) { 
     foreach(var mod in skin.modifications) {
-            this.Write("    Modification ");
+            this.Write("      Modification ");
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
             this.Write("Modification;\r\n");
     } 
    } 
-            this.Write(@"    ///
-    ///////////////////////////////////////////////////////////
-    
-    void DynamicSkinBeforeStart()
-    {
-      dynamicSkin.InstanceLogger = Instance.Logger;
-      new Hook(typeof(SkinDef).GetMethod(nameof(SkinDef.Apply)), (Action<Action<SkinDef, GameObject>, SkinDef, GameObject>) dynamicSkin.SkinDefApply).Apply();
-    }
+            this.Write(@"      ///
+      ///////////////////////////////////////////////////////////
+      
+      internal void BeforeStart()
+      {
+        _DynamicSkinManager.InstanceLogger = Instance.Logger;
+        new Hook(typeof(SkinDef).GetMethod(nameof(SkinDef.Apply)), (Action<Action<SkinDef, GameObject>, SkinDef, GameObject>) _DynamicSkinManager.SkinDefApply).Apply();
+      }
 
-    void DynamicSkinAfterStart()
-    {
-      InitializeModifications();
-      InitializeDynamicBones();
-      AddModificationsToList();
-    }
+      internal void AfterStart()
+      {
+        InitializeModifications();
+        InitializeDynamicBones();
+        AddModificationsToList();
+      }
 
-    static void DynamicSkinBeforeBodyCatalogInit()
-    {
+      internal void BeforeBodyCatalogInit()
+      {
 ");
   foreach(var skin in info.dynamicSkins) { 
-            this.Write("      ");
+            this.Write("        ");
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.bodyName + skin.skinDef.name));
             this.Write("SkinAddedEvent += onSkinAdded;\r\n");
 }
-            this.Write("    }\r\n\r\n    static void DynamicSkinAfterBodyCatalogInit(){}\r\n    \r\n    void Init" +
-                    "ializeModifications()\r\n    {\r\n");
+            this.Write("      }\r\n\r\n      internal void AfterBodyCatalogInit(){}\r\n      \r\n      void Initi" +
+                    "alizeModifications()\r\n      {\r\n");
   foreach(var skin in info.dynamicSkins) {
     int externalIndexer = -1;
     var rend = info.GetMainRenderer(skin);
     foreach(var mod in skin.modifications) {
       //ModificationName = new Modification("PrefabName.prefab", "ParentName", "BodyName", "SkinNameToken" false, assetBundle);
 
-            this.Write("      ");
+            this.Write("        ");
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
             this.Write("Modification = new Modification(\"");
             this.Write(this.ToStringHelper.ToStringWithCulture(mod.prefab.name));
@@ -91,25 +99,25 @@ namespace RuneFoxMods.DynamicSkinBuilder
             this.Write(", assetBundle);\r\n");
    }
   } 
-            this.Write("    }\r\n\r\n    void InitializeDynamicBones()\r\n    {\r\n");
+            this.Write("      }\r\n\r\n      void InitializeDynamicBones()\r\n      {\r\n");
   foreach(var skin in info.dynamicSkins) { 
     foreach(var mod in skin.modifications) {
     //ModificationName.dynamicBoneData = null; //get from DB reader
 
-            this.Write("      ");
+            this.Write("        ");
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.name + mod.prefab.name));
             this.Write("Modification.dynamicBoneData = ");
             this.Write(this.ToStringHelper.ToStringWithCulture(DynamicBoneReader.CreateConstructor(mod.dynamicBone)));
             this.Write("\r\n");
  }
 }
-            this.Write("    }\r\n\r\n    void AddModificationsToList()\r\n    {\r\n");
+            this.Write("      }\r\n\r\n      void AddModificationsToList()\r\n      {\r\n");
   foreach(var skin in info.dynamicSkins) { 
       var rend = info.GetMainRenderer(skin);
       int externalIndexer = -1;
       for(int i = 0; i< skin.modifications.Count; i++) {
       var mod = skin.modifications[i]; 
-            this.Write("      dynamicSkin.AddModification(\"");
+            this.Write("        _DynamicSkinManager.AddModification(\"");
             this.Write(this.ToStringHelper.ToStringWithCulture(skin.skinDef.CreateNameToken(info.modInfo.author)));
             this.Write("\", ");
             this.Write(this.ToStringHelper.ToStringWithCulture(mod.affectsBaseModel?DynamicSkinHelpers.GetBoneIndexInList(mod.dynamicBone.transform, rend):externalIndexer--));
@@ -119,8 +127,8 @@ namespace RuneFoxMods.DynamicSkinBuilder
  } 
             this.Write("    \r\n");
  } 
-            this.Write("    }\r\n\r\n    static void onSkinAdded(object sender, SkinAddedArgs e)\r\n    {\r\n    " +
-                    "  dynamicSkin.AddSkinDef(e.skinDef);\r\n    }\r\n  }\r\n}");
+            this.Write("      }\r\n\r\n      static void onSkinAdded(object sender, SkinAddedArgs e)\r\n      {" +
+                    "\r\n        _DynamicSkinManager.AddSkinDef(e.skinDef);\r\n      }\r\n    }\r\n  }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
