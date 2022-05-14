@@ -4,12 +4,20 @@ using System.Linq;
 using UnityEngine;
 using RoRSkinBuilder.Data;
 using RuneFoxMods.DynamicSkins;
+using RuneFoxMods.RoRSkinBuilderExtension;
 
 namespace RuneFoxMods.DynamicSkinBuilder
 {
   [AddComponentMenu("RoR Skins/Dynamic Skin Info")]
-  public class DynamicSkinInfo : MonoBehaviour
+  public class DynamicSkinInfo : ExtensionBase
   {
+    ////////////////////////////////////////////////
+    /// Inherited Override
+    private static readonly string _name = "DynamicSkin";
+    public override string Name {get {return _name;} }
+    ///
+    ////////////////////////////////////////////////
+
     public SkinModInfo modInfo;
   
     public AssetsInfo assetInfo;

@@ -2,7 +2,8 @@
     "name": "runefox237.dynamicskinbuilder",
     "references": [
         "GUID:420d696f3c2739f4697e78d61fd43b2e",
-        "GUID:ef8e48022c84faa4db6ea42cb5bfc8e5"
+        "GUID:ef8e48022c84faa4db6ea42cb5bfc8e5",
+        "GUID:b95240a7a70e9d443af96a4bc75dd4b0"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
